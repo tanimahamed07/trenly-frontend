@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { registerUser } from "@/services/auth.service";
 import { TRegisterData } from "@/types/user";
+import Image from "next/image";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -46,13 +47,12 @@ const RegisterPage = () => {
     }
 
     try {
-      // ডাটা পাঠানোর সময় টাইপ কনফার্ম করা
       const registrationData: TRegisterData = {
         name,
         email,
         password,
         role: "user",
-        avatar: `https://ui-avatars.com/api/?name=${name}`, // ইউজারের নামের প্রথম অক্ষর দিয়ে অবতার
+        avatar: `https://ui-avatars.com/api/?name=${name}`,
       };
 
       const res = await registerUser(registrationData);
@@ -64,7 +64,7 @@ const RegisterPage = () => {
       } else {
         setError(data.message || "Registration failed!");
       }
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -274,10 +274,12 @@ const RegisterPage = () => {
           </div>
 
           <button className="btn btn-outline border-base-300 hover:bg-base-200 w-full h-14 rounded-2xl gap-3 normal-case font-bold text-neutral transition-all">
-            <img
+            <Image
               src="https://www.svgrepo.com/show/475656/google-color.svg"
-              className="w-5 h-5"
+              width={20}
+              height={20}
               alt="Google"
+              className="w-5 h-5" 
             />
             Continue with Google
           </button>
