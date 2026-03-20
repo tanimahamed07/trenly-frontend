@@ -1,4 +1,4 @@
-export interface Product {
+export interface TProduct {
   _id: string;
   title: string;
   description: string;
@@ -22,7 +22,7 @@ export interface Product {
 
 export interface ProductsResponse {
   success: boolean;
-  data: Product[];
+  data: TProduct[];
   meta: {
     page: number;
     limit: number;

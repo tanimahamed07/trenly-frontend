@@ -1,4 +1,4 @@
-export interface Order {
+export interface TOrder {
   _id: string;
   userId: string;
   itemId: string;

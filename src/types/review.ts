@@ -1,4 +1,4 @@
- export interface Review {
+ export interface TReview {
   _id: string;
   rating: number;
   comment: string;
