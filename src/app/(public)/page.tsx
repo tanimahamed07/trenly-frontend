@@ -2,6 +2,7 @@ import Navbar from "@/components/shared/Navbar";
 import HeroSection from "@/components/ui/Banner";
 import Featured from "@/components/ui/Featured";
 import Features from "@/components/ui/Features";
+import NewArrivals from "@/components/ui/NewArrivals";
 import Trending from "@/components/ui/Trending";
 import React from "react";
 
@@ -13,6 +14,7 @@ const page = () => {
       <Features></Features>
       <Featured></Featured>
       <Trending></Trending>
+      <NewArrivals></NewArrivals>
     </div>
   );
 };
