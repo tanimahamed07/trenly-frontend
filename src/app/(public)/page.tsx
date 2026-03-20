@@ -1,12 +1,14 @@
 import Navbar from "@/components/shared/Navbar";
-import Banner from "@/components/ui/Banner";
+import HeroSection from "@/components/ui/Banner";
+import Features from "@/components/ui/Features";
 import React from "react";
 
 const page = () => {
   return (
     <div>
       <Navbar></Navbar>
-      <Banner></Banner>
+      <HeroSection></HeroSection>
+      <Features></Features>
     </div>
   );
 };
