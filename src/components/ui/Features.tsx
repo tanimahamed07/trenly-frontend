@@ -1,78 +1,155 @@
 import React from 'react';
-import { Truck, ShieldCheck, RotateCcw, Headset, ArrowRight } from 'lucide-react';
+import { Truck, ShieldCheck, RotateCcw, Headset } from 'lucide-react';
+
+const featureData = [
+  {
+    icon: <Truck size={28} />,
+    title: "Free Delivery",
+    desc: "Orders over $99",
+    color: "bg-primary/10 text-primary",
+    glowColor: "group-hover:shadow-[0_8px_40px_oklch(45%_0.16_250/0.15)]",
+    borderHover: "hover:border-[oklch(45%_0.16_250/0.4)]",
+    bgAccent: "oklch(45%_0.16_250)",
+  },
+  {
+    icon: <ShieldCheck size={28} />,
+    title: "Secure Payment",
+    desc: "100% protected",
+    color: "bg-green-500/10 text-green-600",
+    glowColor: "group-hover:shadow-[0_8px_40px_rgb(16_185_129/0.15)]",
+    borderHover: "hover:border-green-500/40",
+    bgAccent: "rgb(16,185,129)",
+  },
+  {
+    icon: <RotateCcw size={28} />,
+    title: "Easy Return",
+    desc: "30 days policy",
+    color: "bg-orange-500/10 text-orange-600",
+    glowColor: "group-hover:shadow-[0_8px_40px_rgb(249_115_22/0.15)]",
+    borderHover: "hover:border-orange-500/40",
+    bgAccent: "rgb(249,115,22)",
+  },
+  {
+    icon: <Headset size={28} />,
+    title: "24/7 Support",
+    desc: "Customer care",
+    color: "bg-blue-500/10 text-blue-600",
+    glowColor: "group-hover:shadow-[0_8px_40px_rgb(59_130_246/0.15)]",
+    borderHover: "hover:border-blue-500/40",
+    bgAccent: "rgb(59,130,246)",
+  },
+];
 
 const Features = () => {
-    const featureData = [
-        {
-            icon: <Truck size={24} />,
-            title: "Free Delivery",
-            desc: "Orders over $99",
-            bg: "bg-primary/5",
-            iconColor: "text-primary"
-        },
-        {
-            icon: <ShieldCheck size={24} />,
-            title: "Secure Payment",
-            desc: "100% protected",
-            bg: "bg-success/5",
-            iconColor: "text-success"
-        },
-        {
-            icon: <RotateCcw size={24} />,
-            title: "Easy Return",
-            desc: "30 days policy",
-            bg: "bg-warning/5",
-            iconColor: "text-warning"
-        },
-        {
-            icon: <Headset size={24} />,
-            title: "24/7 Support",
-            desc: "Customer care",
-            bg: "bg-info/5",
-            iconColor: "text-info"
-        }
-    ];
+  return (
+    <section className="py-16 md:py-24 bg-base-100 relative overflow-hidden">
+      {/* Ambient blobs */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
-    return (
-        <section className="py-16 bg-base-100 relative overflow-hidden">
-            {/* Background Decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] rounded-full" />
-            
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {featureData.map((item, index) => (
-                        <div 
-                            key={index}
-                            className="group relative p-8 rounded-[2.5rem] bg-base-200/30 border border-base-300/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5"
-                        >
-                            {/* Icon Box */}
-                            <div className={`w-14 h-14 rounded-2xl ${item.bg} ${item.iconColor} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-sm`}>
-                                {item.icon}
-                            </div>
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
 
-                            {/* Text Content */}
-                            <div className="space-y-2">
-                                <h4 className="text-xl font-black text-secondary tracking-tight">
-                                    {item.title}
-                                </h4>
-                                <p className="text-sm font-medium text-neutral/50 leading-relaxed">
-                                    {item.desc}
-                                </p>
-                            </div>
+        {/* Header */}
+        <div className="space-y-2 md:space-y-3 mb-8 md:mb-14">
+          <span className="inline-flex items-center gap-2 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-primary bg-primary/8 px-3 py-1 rounded-full border border-primary/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block" />
+            Why Us
+          </span>
+          <h2 className="text-2xl md:text-4xl font-black text-secondary tracking-tight leading-tight">
+            Why{" "}
+            <span className="text-primary italic relative">
+              Choose Us
+              <svg
+                className="absolute -bottom-1 left-0 w-full"
+                viewBox="0 0 100 6"
+                preserveAspectRatio="none"
+                height="6"
+              >
+                <path
+                  d="M0 5 Q50 0 100 5"
+                  stroke="oklch(45% 0.16 250)"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeOpacity="0.4"
+                />
+              </svg>
+            </span>
+          </h2>
+          <p className="text-neutral/40 font-medium text-xs md:text-sm">
+            Everything you need, all in one place
+          </p>
+        </div>
 
-                            {/* Decorative Arrow (Visible on Hover) */}
-                            <div className="absolute bottom-8 right-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500 text-primary">
-                                <ArrowRight size={20} />
-                            </div>
-
-                            {/* Subtle Gradient Overlay on Hover */}
-                            <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        </div>
-                    ))}
+        {/* Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          {featureData.map((item, index) => (
+            <div
+              key={index}
+              className={`
+                group relative overflow-hidden
+                p-4 md:p-8
+                rounded-[1.5rem] md:rounded-[2.5rem]
+                bg-base-200/40
+                border border-base-300/60
+                ${item.borderHover}
+                ${item.glowColor}
+                transition-all duration-500
+                hover:-translate-y-1
+              `}
+            >
+              {/* Top: icon row */}
+              <div className="flex items-start justify-between mb-4 md:mb-8">
+                {/* Icon Box */}
+                <div
+                  className={`
+                    w-11 h-11 md:w-16 md:h-16
+                    rounded-xl md:rounded-3xl
+                    ${item.color}
+                    flex items-center justify-center
+                    group-hover:scale-110 group-hover:-rotate-6
+                    transition-transform duration-500
+                    shrink-0
+                  `}
+                >
+                  <span className="block md:hidden">
+                    {React.cloneElement(item.icon as React.ReactElement, { size: 20 })}
+                  </span>
+                  <span className="hidden md:block">{item.icon}</span>
                 </div>
+              </div>
+
+              {/* Info */}
+              <div className="relative z-10 space-y-0.5 md:space-y-1">
+                <h3 className="text-sm md:text-xl font-black text-secondary leading-tight">
+                  {item.title}
+                </h3>
+                <p className="text-[9px] md:text-xs font-bold opacity-35 uppercase tracking-widest">
+                  {item.desc}
+                </p>
+              </div>
+
+              {/* Ghost icon background */}
+              <div className="absolute -bottom-3 -right-3 opacity-[0.04] group-hover:opacity-[0.09] group-hover:scale-110 transition-all duration-500">
+                <div className="w-[70px] h-[70px] md:w-[120px] md:h-[120px]">
+                  {React.cloneElement(item.icon as React.ReactElement, {
+                    size: undefined,
+                    className: "w-full h-full",
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom shimmer line */}
+              <div
+                className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 rounded-full"
+                style={{ background: item.bgAccent, opacity: 0.5 }}
+              />
             </div>
-        </section>
-    );
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
 };
 
 export default Features;

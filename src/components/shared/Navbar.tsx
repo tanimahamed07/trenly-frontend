@@ -5,47 +5,48 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
-  ShoppingBag, Menu, X, User, LogOut, LayoutDashboard,
-  Moon, Sun, Home, LayoutGrid, ShoppingCart, UserPlus,
-  LogIn, Info, Mail,
+  ShoppingBag, Menu, X,
+  Moon, Sun, Home, LayoutGrid, ShoppingCart
 } from "lucide-react";
 import Image from "next/image";
 
 const Navbar = () => {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [theme, setTheme] = useState("light");
   const pathname = usePathname();
 
-  const { data: session, status } = useSession();
-  const user = session?.user as any; // Role এক্সেস করার জন্য কাস্টিং
+  const { data: session } = useSession();
+  const user = session?.user as any;
 
   useEffect(() => {
-    // থিম হ্যান্ডলিং
+    setMounted(true);
     const storedTheme = localStorage.getItem("theme") || "light";
-    applyTheme(storedTheme);
+    setTheme(storedTheme);
+    document.documentElement.setAttribute("data-theme", storedTheme);
 
-    // স্ক্রল ডিটেকশন
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const applyTheme = (newTheme: string) => {
-    setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
+  // ✅ FIX 1: overflow lock/unlock সঠিকভাবে, cleanup সহ
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  // ✅ FIX 2: route change হলে menu বন্ধ হবে
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const toggleTheme = () => {
     const nextTheme = theme === "light" ? "dark" : "light";
-    applyTheme(nextTheme);
-  };
-
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/login" });
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
   };
 
   const navLinks = [
@@ -55,36 +56,38 @@ const Navbar = () => {
     { name: "Cart", href: "/cart", icon: <ShoppingCart size={18} /> },
   ];
 
+  if (!mounted) return <div className="h-[65px] sm:h-[81px] bg-base-100" />;
+
   return (
     <>
-      {/* পরিবর্তন: 'sticky top-0' ব্যবহার করা হয়েছে যাতে এটি জায়গা দখল করে রাখে।
-         শুরুতে 'bg-base-100' রাখা হয়েছে যাতে স্বচ্ছতার কারণে নিচের কন্টেন্ট নেভবারের ভেতরে না দেখায়।
-      */}
-      <nav className={`sticky top-0 w-full z-[100] transition-all duration-300 ${
-        isScrolled 
-        ? "bg-base-100/80 backdrop-blur-md shadow-md py-2" 
-        : "bg-base-100 py-4 border-b border-base-200"
+      <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${
+        isScrolled
+          ? "bg-base-100/80 backdrop-blur-xl shadow-xl py-2"
+          : "bg-base-100 py-3 sm:py-4 border-b border-base-200"
       }`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
+
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <div className="bg-primary p-2 rounded-xl transition-transform group-hover:rotate-12 shadow-lg shadow-primary/20">
-                <ShoppingBag className="w-6 h-6 text-white" />
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-2xl font-black tracking-tighter text-neutral dark:text-white uppercase italic">
-                TRENDly<span className="text-primary text-4xl">.</span>
+              <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">
+                TRENDly<span className="text-primary text-3xl sm:text-4xl">.</span>
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-6">
+            {/* Desktop nav links */}
+            <div className="hidden lg:flex items-center gap-2">
               {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
+                <Link
+                  key={link.name}
                   href={link.href}
-                  className={`flex items-center gap-2 text-sm font-bold transition-all hover:text-primary px-3 py-2 rounded-lg hover:bg-primary/5 ${
-                    pathname === link.href ? "text-primary bg-primary/5" : "text-neutral/70 dark:text-white/70"
+                  className={`flex items-center gap-2 text-sm font-bold transition-all px-4 py-2 rounded-xl ${
+                    pathname === link.href
+                      ? "text-primary bg-primary/5"
+                      : "text-neutral/70 dark:text-white/70 hover:bg-base-200"
                   }`}
                 >
                   {link.icon}{link.name}
@@ -92,131 +95,170 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="hidden lg:flex items-center gap-4">
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme} 
-                className="p-2.5 rounded-xl bg-base-200 dark:bg-gray-800 text-neutral dark:text-white hover:scale-105 transition-all border border-base-300 dark:border-gray-700"
+            {/* Right side actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="hidden sm:flex p-2.5 rounded-xl bg-base-200 border border-base-300"
               >
-                {theme === "dark" ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-primary" />}
+                {theme === "dark"
+                  ? <Sun size={18} className="text-yellow-400" />
+                  : <Moon size={18} className="text-primary" />}
               </button>
 
-              {/* User Auth */}
-              {status === "loading" ? (
-                <div className="w-10 h-10 rounded-full bg-base-300 animate-pulse" />
-              ) : user ? (
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20 ring-offset-2 ring-offset-base-100">
-                    <div className="w-10 rounded-full">
-                      <Image 
-                        alt="User" 
-                        src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} 
-                        width={40} 
-                        height={40} 
+              {/* Desktop user/auth */}
+              {user ? (
+                <div className="hidden lg:block dropdown dropdown-end">
+                  <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20">
+                    <div className="w-9 sm:w-10 rounded-full">
+                      <Image
+                        alt="User"
+                        src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                        width={40} height={40}
                       />
                     </div>
                   </div>
-                  <ul tabIndex={0} className="mt-4 p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 dark:bg-base-200 rounded-2xl w-60 border border-base-300 z-[110]">
-                    <div className="px-4 py-3 border-b border-base-200 mb-2">
-                      <p className="font-black text-sm text-neutral dark:text-white truncate">{user.name}</p>
-                      <p className="text-[10px] opacity-60 uppercase font-black text-primary tracking-widest">{user.role}</p>
+                  <ul tabIndex={0} className="mt-4 p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-2xl w-56 border border-base-300 z-[110]">
+                    <div className="px-4 py-2 border-b border-base-200 mb-2">
+                      <p className="font-black text-sm truncate">{user.name}</p>
                     </div>
-                    <li><Link href="/dashboard" className="py-2.5"><LayoutDashboard size={18} /> Dashboard</Link></li>
-                    <li><Link href="/dashboard/profile" className="py-2.5"><User size={18} /> Profile</Link></li>
-                    <li className="text-error border-t border-base-200 mt-2">
-                      <button onClick={handleLogout} className="py-2.5 font-bold"><LogOut size={18} /> Logout</button>
+                    <li><Link href="/dashboard">Dashboard</Link></li>
+                    <li>
+                      <button onClick={() => signOut()} className="text-error font-bold">
+                        Logout
+                      </button>
                     </li>
                   </ul>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/login" className="btn btn-ghost btn-sm font-bold text-neutral dark:text-white normal-case px-4">
-                    Login
-                  </Link>
-                  <Link href="/register" className="btn btn-primary btn-sm rounded-xl font-bold text-white normal-case px-6 shadow-lg shadow-primary/20">
-                    Join Now
-                  </Link>
+                <div className="hidden lg:flex items-center gap-2">
+                  <Link href="/login" className="btn btn-ghost btn-sm font-bold">Login</Link>
+                  <Link href="/register" className="btn btn-primary btn-sm rounded-xl text-white px-5">Join</Link>
                 </div>
               )}
-            </div>
 
-            {/* Mobile Menu Button */}
-            <div className="flex items-center gap-2 lg:hidden">
-               <button 
-                  onClick={toggleTheme} 
-                  className="p-2 rounded-lg bg-base-200 dark:bg-gray-800"
-                >
-                  {theme === "dark" ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} />}
-                </button>
-              <button 
-                className="p-2 text-neutral dark:text-white bg-base-200 dark:bg-gray-800 rounded-lg" 
-                onClick={() => setIsOpen(!isOpen)}
+              {/* ✅ FIX 3: Hamburger button — সঠিকভাবে toggle */}
+              <button
+                className="lg:hidden p-2 bg-base-200 rounded-lg"
+                onClick={() => setIsOpen((prev) => !prev)}
+                aria-label="Toggle menu"
               >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Sidebar Overlay */}
-        {isOpen && (
-          <div 
-            className="fixed inset-0 bg-secondary/20 backdrop-blur-sm z-[110] lg:hidden" 
-            onClick={() => setIsOpen(false)}
-          />
-        )}
-
-        {/* Mobile Sidebar */}
-        <div className={`fixed inset-y-0 right-0 w-[280px] bg-base-100 dark:bg-base-200 shadow-2xl z-[120] transform transition-transform duration-500 ease-in-out lg:hidden ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
-          <div className="p-6 flex flex-col h-full">
-            <div className="flex justify-between items-center mb-10">
-              <span className="font-black text-2xl text-neutral dark:text-white italic tracking-tighter">MENU.</span>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="p-2 bg-base-200 dark:bg-gray-800 rounded-full"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href} 
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-4 text-base font-bold p-4 rounded-2xl transition-all ${
-                    pathname === link.href 
-                    ? "bg-primary text-white shadow-lg shadow-primary/30" 
-                    : "text-neutral/70 dark:text-white/70 hover:bg-base-200"
-                  }`}
-                >
-                  {link.icon} {link.name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="mt-auto space-y-4 pt-6 border-t border-base-200">
-              {user ? (
-                <>
-                  <Link href="/dashboard" onClick={() => setIsOpen(false)} className="btn btn-ghost w-full justify-start gap-3 rounded-2xl">
-                    <LayoutDashboard size={18} /> Dashboard
-                  </Link>
-                  <button onClick={handleLogout} className="btn btn-error btn-outline w-full rounded-2xl gap-3">
-                    <LogOut size={18} /> Logout
-                  </button>
-                </>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  <Link href="/login" onClick={() => setIsOpen(false)} className="btn btn-outline border-base-300 w-full rounded-2xl">Login</Link>
-                  <Link href="/register" onClick={() => setIsOpen(false)} className="btn btn-primary w-full rounded-2xl text-white">Register</Link>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Spacer */}
+      <div className={`${isScrolled ? "h-[60px] sm:h-[68px]" : "h-[65px] sm:h-[81px]"} transition-all duration-500`} />
+
+      {/* ✅ FIX 4: Mobile Drawer — সম্পূর্ণ নতুন, আগে ছিলই না */}
+      {/* Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Drawer panel */}
+      <div className={`
+        fixed top-0 right-0 h-full w-[78vw] max-w-xs z-[120]
+        bg-base-100 shadow-2xl flex flex-col
+        transition-transform duration-300 ease-in-out lg:hidden
+        ${isOpen ? "translate-x-0" : "translate-x-full"}
+      `}>
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-base-200">
+          <span className="text-lg font-black tracking-tighter uppercase italic">
+            TRENDly<span className="text-primary text-2xl">.</span>
+          </span>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-2 rounded-xl bg-base-200"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <nav className="flex flex-col gap-1 px-4 py-6 flex-1 overflow-y-auto">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+                pathname === link.href
+                  ? "bg-primary/10 text-primary"
+                  : "text-neutral/70 hover:bg-base-200"
+              }`}
+            >
+              {link.icon}
+              {link.name}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Drawer footer — user / auth + theme toggle */}
+        <div className="px-4 py-5 border-t border-base-200 space-y-3">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-base-200 font-bold text-sm"
+          >
+            {theme === "dark"
+              ? <Sun size={18} className="text-yellow-400" />
+              : <Moon size={18} className="text-primary" />}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </button>
+
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-base-200">
+                <Image
+                  alt="User"
+                  src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                  width={36} height={36}
+                  className="rounded-full"
+                />
+                <p className="font-black text-sm truncate flex-1">{user.name}</p>
+              </div>
+              <Link
+                href="/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-base-200 font-bold text-sm"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={() => { signOut(); setIsOpen(false); }}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-error hover:bg-error/10 font-bold text-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <div className="flex gap-2">
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="btn btn-ghost btn-sm flex-1 font-bold"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setIsOpen(false)}
+                className="btn btn-primary btn-sm flex-1 rounded-xl text-white"
+              >
+                Join
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 };
