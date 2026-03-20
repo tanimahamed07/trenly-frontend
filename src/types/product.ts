@@ -4,7 +4,6 @@ export interface TProduct {
   description: string;
   shortDescription: string;
   image: string;
-  images: string[];
   price: number;
   compareAtPrice?: number;
   currency: string;
