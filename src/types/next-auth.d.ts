@@ -1,5 +1,4 @@
-
-import NextAuth, { DefaultSession } from "next-auth"
+import { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
   interface Session {
@@ -13,7 +12,7 @@ declare module "next-auth" {
   interface User {
     _id: string;
     role: 'user' | 'admin';
-    token: string; // ব্যাকএন্ড থেকে আসা JWT
+    accessToken: string;
   }
 }
 
