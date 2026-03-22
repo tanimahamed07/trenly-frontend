@@ -14,7 +14,6 @@ import React from "react";
 const page = () => {
   return (
     <div>
-      <Navbar></Navbar>
       <HeroSection></HeroSection>
       <Features></Features>
       <Featured></Featured>
@@ -24,7 +23,6 @@ const page = () => {
       <Testimonials></Testimonials>
       <PromoBanner></PromoBanner>
       <Newsletter></Newsletter>
-      <Footer></Footer>
     </div>
   );
 };

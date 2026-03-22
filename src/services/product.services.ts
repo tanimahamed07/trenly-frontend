@@ -52,3 +52,15 @@ export const getTopRatedProducts = async () => {
   const data = await res.json();
   return data.success ? data.data : [];
 };
+
+
+// services/product.service.ts
+export const getAllProducts = async (queryParams: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/items?${queryParams}`,
+    {
+      cache: "no-store",
+    }
+  );
+  return res.json();
+};
