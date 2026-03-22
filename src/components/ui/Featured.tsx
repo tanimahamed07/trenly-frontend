@@ -8,10 +8,10 @@ const categories = [
     slug: "electronics",
     icon: <Smartphone size={28} />,
     count: "150+ Products",
-    lightColor: "bg-[oklch(45%_0.16_250)/10] text-[oklch(45%_0.16_250)]",
-    glowColor: "group-hover:shadow-[0_8px_40px_oklch(45%_0.16_250/0.15)]",
-    borderHover: "hover:border-[oklch(45%_0.16_250/0.4)]",
-    bgAccent: "oklch(45%_0.16_250)",
+    lightColor: "bg-blue-500/10 text-blue-500",
+    borderHover: "hover:border-blue-500/40",
+    bgAccent: "rgb(59 130 246 / 0.15)",
+    bgSolid: "rgb(59,130,246)",
   },
   {
     name: "Fashion",
@@ -19,9 +19,9 @@ const categories = [
     icon: <Shirt size={28} />,
     count: "280+ Products",
     lightColor: "bg-purple-500/10 text-purple-500",
-    glowColor: "group-hover:shadow-[0_8px_40px_rgb(168_85_247/0.15)]",
     borderHover: "hover:border-purple-500/40",
-    bgAccent: "rgb(168,85,247)",
+    bgAccent: "rgb(168 85 247 / 0.15)",
+    bgSolid: "rgb(168,85,247)",
   },
   {
     name: "Home & Living",
@@ -29,9 +29,9 @@ const categories = [
     icon: <Home size={28} />,
     count: "120+ Products",
     lightColor: "bg-orange-500/10 text-orange-500",
-    glowColor: "group-hover:shadow-[0_8px_40px_rgb(249_115_22/0.15)]",
     borderHover: "hover:border-orange-500/40",
-    bgAccent: "rgb(249,115,22)",
+    bgAccent: "rgb(249 115 22 / 0.15)",
+    bgSolid: "rgb(249,115,22)",
   },
   {
     name: "Sports",
@@ -39,9 +39,9 @@ const categories = [
     icon: <Trophy size={28} />,
     count: "90+ Products",
     lightColor: "bg-emerald-500/10 text-emerald-500",
-    glowColor: "group-hover:shadow-[0_8px_40px_rgb(16_185_129/0.15)]",
     borderHover: "hover:border-emerald-500/40",
-    bgAccent: "rgb(16,185,129)",
+    bgAccent: "rgb(16 185 129 / 0.15)",
+    bgSolid: "rgb(16,185,129)",
   },
 ];
 
@@ -53,11 +53,9 @@ const Featured = () => {
       <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
-
         {/* Header */}
         <div className="flex justify-between items-end mb-14">
           <div className="space-y-3">
-            {/* Eyebrow label */}
             <span className="inline-flex items-center gap-2 text-xs font-black tracking-[0.2em] uppercase text-primary bg-primary/8 px-3 py-1 rounded-full border border-primary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block" />
               Collections
@@ -66,7 +64,6 @@ const Featured = () => {
               Shop by{" "}
               <span className="text-primary italic relative">
                 Category
-                {/* Underline accent */}
                 <svg
                   className="absolute -bottom-1 left-0 w-full"
                   viewBox="0 0 100 6"
@@ -106,6 +103,11 @@ const Featured = () => {
             <Link
               key={index}
               href={`/explore?category=${cat.slug}`}
+              style={
+                {
+                  "--glow-color": cat.bgAccent,
+                } as React.CSSProperties
+              }
               className={`
                 group relative overflow-hidden
                 p-6 md:p-8
@@ -113,9 +115,9 @@ const Featured = () => {
                 bg-base-200/40
                 border border-base-300/60
                 ${cat.borderHover}
-                ${cat.glowColor}
                 transition-all duration-500
                 hover:-translate-y-1
+                hover:shadow-[0_8px_40px_var(--glow-color)]
               `}
             >
               {/* Top: icon + arrow row */}
@@ -152,14 +154,7 @@ const Featured = () => {
               </div>
 
               {/* Ghost icon background */}
-              <div
-                className="
-                  absolute -bottom-3 -right-3
-                  opacity-[0.04] group-hover:opacity-[0.09]
-                  group-hover:scale-110
-                  transition-all duration-500
-                "
-              >
+              <div className="absolute -bottom-3 -right-3 opacity-[0.04] group-hover:opacity-[0.09] group-hover:scale-110 transition-all duration-500">
                 <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]">
                   {cat.icon}
                 </div>
@@ -167,12 +162,8 @@ const Featured = () => {
 
               {/* Bottom shimmer line */}
               <div
-                className="
-                  absolute bottom-0 left-0
-                  h-[2px] w-0 group-hover:w-full
-                  transition-all duration-500 rounded-full
-                "
-                style={{ background: cat.bgAccent, opacity: 0.5 }}
+                className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 rounded-full"
+                style={{ background: cat.bgSolid, opacity: 0.5 }}
               />
             </Link>
           ))}
@@ -188,7 +179,6 @@ const Featured = () => {
             <ArrowRight size={15} />
           </Link>
         </div>
-
       </div>
     </section>
   );

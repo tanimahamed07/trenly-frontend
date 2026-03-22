@@ -4,12 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TProduct } from "@/types/product";
-import { getTrendingProducts } from "@/services/product.services";
+import { getTopRatedProducts } from "@/services/product.services";
 import { AddToCartButton } from "../shared/AddToCartButton";
 
-const Trending = async () => {
-  const products = await getTrendingProducts();
-  console.log("===>", products);
+const TopRated = async () => {
+  const products = await getTopRatedProducts();
 
   return (
     <section className="py-16 md:py-24 bg-base-100 relative overflow-hidden">
@@ -18,6 +17,7 @@ const Trending = async () => {
       <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
+
         {/* Header */}
         <div className="flex justify-between items-end mb-8 md:mb-14">
           <div className="space-y-2 md:space-y-3">
@@ -160,9 +160,10 @@ const Trending = async () => {
             <ArrowRight size={15} />
           </Link>
         </div>
+
       </div>
     </section>
   );
 };
 
-export default Trending;
+export default TopRated;

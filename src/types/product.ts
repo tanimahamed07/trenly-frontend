@@ -14,6 +14,7 @@ export interface TProduct {
   sku: string;
   stock: number;
   isActive: boolean;
+  isTrending: boolean;
   tags: string[];
   createdAt: string;
   updatedAt: string;

@@ -3,6 +3,8 @@ import HeroSection from "@/components/ui/Banner";
 import Featured from "@/components/ui/Featured";
 import Features from "@/components/ui/Features";
 import NewArrivals from "@/components/ui/NewArrivals";
+import Testimonials from "@/components/ui/Testimonials";
+import TopRated from "@/components/ui/TopRated";
 import Trending from "@/components/ui/Trending";
 import React from "react";
 
@@ -15,6 +17,8 @@ const page = () => {
       <Featured></Featured>
       <Trending></Trending>
       <NewArrivals></NewArrivals>
+      <TopRated></TopRated>
+      <Testimonials></Testimonials>
     </div>
   );
 };
