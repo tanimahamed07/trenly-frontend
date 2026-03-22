@@ -1,4 +1,5 @@
-'use client';
+"use client";
+
 import React from "react";
 import { Star, Quote } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -86,7 +87,7 @@ const StarRating = ({ rating }: { rating: number }) => (
     {[...Array(5)].map((_, i) => (
       <Star
         key={i}
-        size={13}
+        size={12}
         className={
           i < rating ? "fill-warning text-warning" : "fill-base-300 text-base-300"
         }
@@ -98,7 +99,6 @@ const StarRating = ({ rating }: { rating: number }) => (
 const Testimonials = () => {
   return (
     <section className="py-16 md:py-24 bg-base-100 relative overflow-hidden">
-      {/* Ambient blobs */}
       <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
@@ -136,18 +136,15 @@ const Testimonials = () => {
             </p>
           </div>
 
-          {/* Aggregate rating */}
           <div className="hidden sm:flex flex-col items-end gap-1">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} size={15} className="fill-warning text-warning" />
+                <Star key={i} size={14} className="fill-warning text-warning" />
               ))}
             </div>
             <span className="text-xs font-black text-secondary">
               4.9{" "}
-              <span className="font-medium text-neutral/40">
-                from 2,400+ reviews
-              </span>
+              <span className="font-medium text-neutral/40">from 2,400+ reviews</span>
             </span>
           </div>
         </div>
@@ -158,44 +155,45 @@ const Testimonials = () => {
           pagination={{ clickable: true }}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={true}
-          spaceBetween={20}
+          spaceBetween={16}
           breakpoints={{
             0: { slidesPerView: 1 },
             768: { slidesPerView: 2 },
             1024: { slidesPerView: 3 },
           }}
-          className="!pb-12"
+          style={{ alignItems: "flex-start" }}
+          className="!pb-10"
         >
           {testimonials.map((t, index) => (
-            <SwiperSlide key={index}>
+            <SwiperSlide key={index} style={{ height: "auto" }}>
               <div
                 style={{ "--glow-color": t.bgAccent } as React.CSSProperties}
                 className={`
-                  group relative overflow-hidden h-full
+                  group relative overflow-hidden
                   bg-base-200/40
                   border border-base-300/60
                   ${t.borderHover}
-                  rounded-[1.5rem] md:rounded-[2rem]
-                  p-5 md:p-6
+                  rounded-[1.25rem]
+                  p-4 md:p-5
                   transition-all duration-500
                   hover:-translate-y-1
                   hover:shadow-[0_8px_40px_var(--glow-color)]
                 `}
               >
-                {/* Ghost quote icon */}
-                <div className="absolute top-4 right-4 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity duration-300 pointer-events-none">
-                  <Quote size={52} />
+                {/* Ghost quote */}
+                <div className="absolute top-3 right-3 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity duration-300 pointer-events-none">
+                  <Quote size={36} />
                 </div>
 
                 {/* Top: avatar + rating */}
-                <div className="flex items-start justify-between mb-4 md:mb-5">
+                <div className="flex items-center justify-between mb-3">
                   <div
                     className={`
-                      w-12 h-12 md:w-14 md:h-14
-                      rounded-2xl
+                      w-10 h-10
+                      rounded-xl
                       ${t.avatarColor}
                       flex items-center justify-center
-                      text-sm font-black
+                      text-xs font-black
                       group-hover:scale-110 group-hover:-rotate-6
                       transition-transform duration-500
                       shrink-0
@@ -207,23 +205,23 @@ const Testimonials = () => {
                 </div>
 
                 {/* Review text */}
-                <p className="text-sm md:text-[15px] text-neutral/65 leading-relaxed font-medium">
+                <p className="text-sm text-neutral/65 leading-relaxed font-medium">
                   "{t.text}"
                 </p>
 
                 {/* Product tag */}
-                <div className="mt-3 md:mt-4">
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-primary/60 bg-primary/5 border border-primary/10 px-2.5 py-1 rounded-lg">
+                <div className="mt-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-primary/60 bg-primary/5 border border-primary/10 px-2 py-0.5 rounded-lg">
                     <span className="w-1 h-1 rounded-full bg-primary/40 inline-block" />
                     {t.product}
                   </span>
                 </div>
 
                 {/* Divider */}
-                <div className="my-4 h-px bg-base-300/60" />
+                <div className="my-3 h-px bg-base-300/60" />
 
                 {/* Author row */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div>
                     <p className="text-sm font-black text-secondary leading-tight">
                       {t.name}
