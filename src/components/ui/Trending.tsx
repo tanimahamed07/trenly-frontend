@@ -10,7 +10,6 @@ import ProductCard from "../shared/ProductCard";
 
 const Trending = async () => {
   const products = await getTrendingProducts();
-  console.log("===>", products);
 
   return (
     <section className="py-16 md:py-24 bg-base-100 relative overflow-hidden">
