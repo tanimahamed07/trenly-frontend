@@ -1,8 +1,12 @@
- export interface TReview {
+export interface TReview {
   _id: string;
   rating: number;
   comment: string;
-  userId: { name: string; avatar?: string };
-  itemId: string;
   createdAt: string;
+  userId: {
+    _id: string;
+    name: string;
+    avatar?: string;
+    email: string;
+  };
 }

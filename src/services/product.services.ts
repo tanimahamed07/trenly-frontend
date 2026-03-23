@@ -64,3 +64,45 @@ export const getAllProducts = async (queryParams: string) => {
   );
   return res.json();
 };
+
+import { TProduct } from "@/types/product";
+
+export const getSingleProduct = async (id: string): Promise<TProduct | null> => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${id}`,
+      { cache: "no-store" } 
+    );
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error("Fetch Product Error:", error);
+    return null;
+  }
+};
+
+// src/services/product.service.ts
+import { TProduct, TApiResponse } from "@/types/product";
+
+export const getRelatedProducts = async (
+  category: string,
+  currentId: string,
+  limit: number = 8
+): Promise<TProduct[]> => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/items?category=${category}&limit=${limit}`,
+      { cache: "no-store" }
+    );
+    const data: TApiResponse<TProduct[]> = await res.json();
+    
+    if (!data.success) return [];
+
+    return data.data
+      .filter((p) => p._id !== currentId)
+      .slice(0, 4);
+  } catch (error) {
+    console.error("Related Products Fetch Error:", error);
+    return [];
+  }
+};

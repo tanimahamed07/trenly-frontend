@@ -20,7 +20,10 @@ const ProductCard = ({ product }: { product: TProduct }) => {
                 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
     >
       {/* ২. ইমেজ কন্টেইনারকে লিঙ্কে মুড়িয়ে দিন */}
-      <Link href={`/explore/${product._id}`} className="block relative h-48 sm:h-52 md:h-64 w-full overflow-hidden rounded-[1rem] md:rounded-[1.5rem] cursor-pointer">
+      <Link
+        href={`/explore/${product._id}`}
+        className="block relative h-48 sm:h-52 md:h-64 w-full overflow-hidden rounded-[1rem] md:rounded-[1.5rem] cursor-pointer"
+      >
         <Image
           src={product.image}
           alt={product.title}
@@ -31,7 +34,7 @@ const ProductCard = ({ product }: { product: TProduct }) => {
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-           <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase bg-secondary text-base-100 px-2 py-0.5 rounded-lg shadow-lg">
+          <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase bg-secondary text-base-100 px-2 py-0.5 rounded-lg shadow-lg">
             NEW
           </span>
           {product.compareAtPrice && product.compareAtPrice > product.price && (
@@ -57,7 +60,9 @@ const ProductCard = ({ product }: { product: TProduct }) => {
           </span>
           <div className="flex items-center gap-1 bg-warning/10 px-2 py-0.5 rounded-lg">
             <Star size={12} className="fill-warning text-warning" />
-            <span className="text-xs font-bold text-warning">{product.rating}</span>
+            <span className="text-xs font-bold text-warning">
+              {product.rating}
+            </span>
           </div>
         </div>
 
