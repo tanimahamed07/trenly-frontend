@@ -2,7 +2,7 @@ import Navbar from "@/components/shared/Navbar";
 import HeroSection from "@/components/ui/Banner";
 import Featured from "@/components/ui/Featured";
 import Features from "@/components/ui/Features";
-import Footer from "@/components/ui/Footer";
+import Footer from "@/components/shared/Footer";
 import NewArrivals from "@/components/ui/NewArrivals";
 import Newsletter from "@/components/ui/Newsletter";
 import PromoBanner from "@/components/ui/PromoBanner";
