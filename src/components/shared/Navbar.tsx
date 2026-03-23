@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   ShoppingBag, Menu, X,
-  Moon, Sun, Home, LayoutGrid, ShoppingCart
+  Moon, Sun, Home, LayoutGrid, ShoppingCart, Info, Mail
 } from "lucide-react";
 import Image from "next/image";
 
@@ -52,6 +52,8 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={18} /> },
     { name: "Shop", href: "/explore", icon: <LayoutGrid size={18} /> },
+    { name: "About", href: "/about", icon: <Info size={18} /> },
+    { name: "Contract", href: "/contract", icon: <Mail size={18} /> },
     { name: "Orders", href: "/dashboard/my-orders", icon: <ShoppingBag size={18} /> },
     { name: "Cart", href: "/cart", icon: <ShoppingCart size={18} /> },
   ];

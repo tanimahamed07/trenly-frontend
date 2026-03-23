@@ -1,9 +1,18 @@
 import React from 'react';
-import { Truck, ShieldCheck, RotateCcw, Headset } from 'lucide-react';
+import { Truck, ShieldCheck, RotateCcw, Headset, LucideIcon } from 'lucide-react';
 
-const featureData = [
+// ✅ icon কে JSX element না রেখে Component হিসেবে রাখো
+const featureData: {
+  icon: LucideIcon;
+  title: string;
+  desc: string;
+  color: string;
+  glowColor: string;
+  borderHover: string;
+  bgAccent: string;
+}[] = [
   {
-    icon: <Truck size={28} />,
+    icon: Truck,
     title: "Free Delivery",
     desc: "Orders over $99",
     color: "bg-primary/10 text-primary",
@@ -12,7 +21,7 @@ const featureData = [
     bgAccent: "oklch(45%_0.16_250)",
   },
   {
-    icon: <ShieldCheck size={28} />,
+    icon: ShieldCheck,
     title: "Secure Payment",
     desc: "100% protected",
     color: "bg-green-500/10 text-green-600",
@@ -21,7 +30,7 @@ const featureData = [
     bgAccent: "rgb(16,185,129)",
   },
   {
-    icon: <RotateCcw size={28} />,
+    icon: RotateCcw,
     title: "Easy Return",
     desc: "30 days policy",
     color: "bg-orange-500/10 text-orange-600",
@@ -30,7 +39,7 @@ const featureData = [
     bgAccent: "rgb(249,115,22)",
   },
   {
-    icon: <Headset size={28} />,
+    icon: Headset,
     title: "24/7 Support",
     desc: "Customer care",
     color: "bg-blue-500/10 text-blue-600",
@@ -43,13 +52,10 @@ const featureData = [
 const Features = () => {
   return (
     <section className="py-16 md:py-24 bg-base-100 relative overflow-hidden">
-      {/* Ambient blobs */}
       <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-
-        {/* Header */}
         <div className="space-y-2 md:space-y-3 mb-8 md:mb-14">
           <span className="inline-flex items-center gap-2 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-primary bg-primary/8 px-3 py-1 rounded-full border border-primary/20">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block" />
@@ -80,73 +86,67 @@ const Features = () => {
           </p>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-          {featureData.map((item, index) => (
-            <div
-              key={index}
-              className={`
-                group relative overflow-hidden
-                p-4 md:p-8
-                rounded-[1.5rem] md:rounded-[2.5rem]
-                bg-base-200/40
-                border border-base-300/60
-                ${item.borderHover}
-                ${item.glowColor}
-                transition-all duration-500
-                hover:-translate-y-1
-              `}
-            >
-              {/* Top: icon row */}
-              <div className="flex items-start justify-between mb-4 md:mb-8">
-                {/* Icon Box */}
-                <div
-                  className={`
-                    w-11 h-11 md:w-16 md:h-16
-                    rounded-xl md:rounded-3xl
-                    ${item.color}
-                    flex items-center justify-center
-                    group-hover:scale-110 group-hover:-rotate-6
-                    transition-transform duration-500
-                    shrink-0
-                  `}
-                >
-                  <span className="block md:hidden">
-                    {React.cloneElement(item.icon as React.ReactElement, { size: 20 })}
-                  </span>
-                  <span className="hidden md:block">{item.icon}</span>
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="relative z-10 space-y-0.5 md:space-y-1">
-                <h3 className="text-sm md:text-xl font-black text-secondary leading-tight">
-                  {item.title}
-                </h3>
-                <p className="text-[9px] md:text-xs font-bold opacity-35 uppercase tracking-widest">
-                  {item.desc}
-                </p>
-              </div>
-
-              {/* Ghost icon background */}
-              <div className="absolute -bottom-3 -right-3 opacity-[0.04] group-hover:opacity-[0.09] group-hover:scale-110 transition-all duration-500">
-                <div className="w-[70px] h-[70px] md:w-[120px] md:h-[120px]">
-                  {React.cloneElement(item.icon as React.ReactElement, {
-                    size: undefined,
-                    className: "w-full h-full",
-                  })}
-                </div>
-              </div>
-
-              {/* Bottom shimmer line */}
+          {featureData.map((item, index) => {
+            // ✅ Component হিসেবে use করো — cloneElement লাগবে না
+            const Icon = item.icon;
+            return (
               <div
-                className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 rounded-full"
-                style={{ background: item.bgAccent, opacity: 0.5 }}
-              />
-            </div>
-          ))}
-        </div>
+                key={index}
+                className={`
+                  group relative overflow-hidden
+                  p-4 md:p-8
+                  rounded-[1.5rem] md:rounded-[2.5rem]
+                  bg-base-200/40
+                  border border-base-300/60
+                  ${item.borderHover}
+                  ${item.glowColor}
+                  transition-all duration-500
+                  hover:-translate-y-1
+                `}
+              >
+                <div className="flex items-start justify-between mb-4 md:mb-8">
+                  <div
+                    className={`
+                      w-11 h-11 md:w-16 md:h-16
+                      rounded-xl md:rounded-3xl
+                      ${item.color}
+                      flex items-center justify-center
+                      group-hover:scale-110 group-hover:-rotate-6
+                      transition-transform duration-500
+                      shrink-0
+                    `}
+                  >
+                    {/* ✅ size prop সরাসরি দাও */}
+                    <Icon size={20} className="md:hidden" />
+                    <Icon size={28} className="hidden md:block" />
+                  </div>
+                </div>
 
+                <div className="relative z-10 space-y-0.5 md:space-y-1">
+                  <h3 className="text-sm md:text-xl font-black text-secondary leading-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-[9px] md:text-xs font-bold opacity-35 uppercase tracking-widest">
+                    {item.desc}
+                  </p>
+                </div>
+
+                {/* Ghost icon */}
+                <div className="absolute -bottom-3 -right-3 opacity-[0.04] group-hover:opacity-[0.09] group-hover:scale-110 transition-all duration-500">
+                  <Icon size={100} className="hidden md:block" />
+                  <Icon size={70} className="md:hidden" />
+                </div>
+
+                {/* Bottom shimmer */}
+                <div
+                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 rounded-full"
+                  style={{ background: item.bgAccent, opacity: 0.5 }}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
