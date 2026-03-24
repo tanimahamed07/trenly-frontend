@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers";
 import { CartProvider } from "@/context/CartContext";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         <CartProvider>
           <Providers>{children}</Providers>
+          <Toaster position="top-center" richColors /> {/* এখানে টুস্টারটি বসান */}
         </CartProvider>
       </body>
     </html>

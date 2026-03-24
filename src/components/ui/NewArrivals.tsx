@@ -1,10 +1,10 @@
 import React from "react";
-import { Star, Heart, ArrowRight, Sparkles } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Sparkles } from "lucide-react";
+
 import Link from "next/link";
 
 import { TProduct } from "@/types/product";
-import { AddToCartButton } from "../shared/AddToCartButton";
+
 import { getNewArrivalProducts } from "@/services/product.services";
 import ProductCard from "../shared/ProductCard";
 

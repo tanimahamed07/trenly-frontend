@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // useSearchParams যোগ করা হয়েছে
 import {
   Mail,
   Lock,
@@ -23,6 +23,7 @@ import Image from "next/image";
 
 const LoginPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams(); // searchParams ইনিশিয়ালাইজ করা হয়েছে
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +33,9 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // handleSubmit replace করো
+  // ইউআরএল থেকে redirect পাথ নেওয়া, না থাকলে হোম পেজ (/)
+  const callbackUrl = searchParams.get("redirect") || "/";
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -50,7 +53,11 @@ const LoginPage = () => {
         setError("Invalid email or password. Please try again.");
       } else {
         setSuccess("Welcome back to TRENDly!");
-        setTimeout(() => router.push("/"), 1500);
+        // নির্ধারিত callbackUrl-এ রিডাইরেক্ট করা
+        setTimeout(() => {
+          router.push(callbackUrl);
+          router.refresh(); 
+        }, 1500);
       }
     } catch {
       setError("Something went wrong. Please try again.");
