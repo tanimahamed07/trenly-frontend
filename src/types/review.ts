@@ -8,5 +8,12 @@ export interface TReview {
     name: string;
     avatar?: string;
     email: string;
+  } | string;
+  itemId: {
+    _id: string;
+    title: string;
+    image: string;
+    price: number;
+    category: string;
   };
 }
