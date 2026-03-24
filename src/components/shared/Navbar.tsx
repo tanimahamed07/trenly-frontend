@@ -9,6 +9,7 @@ import {
   Moon, Sun, Home, LayoutGrid, ShoppingCart, Info, Mail
 } from "lucide-react";
 import Image from "next/image";
+import { useCart } from "@/context/CartContext"; // ✅ Context import kora holo
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [theme, setTheme] = useState("light");
   const pathname = usePathname();
 
+  const { cartCount } = useCart(); // ✅ Cart count niye asha holo
   const { data: session } = useSession();
   const user = session?.user as any;
 
@@ -31,13 +33,11 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ FIX 1: overflow lock/unlock সঠিকভাবে, cleanup সহ
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // ✅ FIX 2: route change হলে menu বন্ধ হবে
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
@@ -86,19 +86,37 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center gap-2 text-sm font-bold transition-all px-4 py-2 rounded-xl ${
+                  className={`relative flex items-center gap-2 text-sm font-bold transition-all px-4 py-2 rounded-xl ${
                     pathname === link.href
                       ? "text-primary bg-primary/5"
                       : "text-neutral/70 dark:text-white/70 hover:bg-base-200"
                   }`}
                 >
-                  {link.icon}{link.name}
+                  {link.icon}
+                  {link.name}
+
+                  {/* ✅ Desktop Cart Badge */}
+                  {link.name === "Cart" && cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-lg border-2 border-base-100 animate-in zoom-in duration-300">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
+              {/* ✅ Mobile Cart Icon (Always visible on mobile) */}
+              <Link href="/cart" className="lg:hidden relative p-2.5 rounded-xl bg-base-200 border border-base-300">
+                <ShoppingCart size={20} className="text-secondary" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-base-100 shadow-md">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
               <button
                 onClick={toggleTheme}
                 className="hidden sm:flex p-2.5 rounded-xl bg-base-200 border border-base-300"
@@ -108,10 +126,11 @@ const Navbar = () => {
                   : <Moon size={18} className="text-primary" />}
               </button>
 
-              {/* Desktop user/auth */}
+              {/* User Dropdown details... (no changes needed) */}
               {user ? (
                 <div className="hidden lg:block dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20">
+                   {/* ... your existing dropdown code */}
+                   <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20">
                     <div className="w-9 sm:w-10 rounded-full">
                       <Image
                         alt="User"
@@ -139,11 +158,9 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* ✅ FIX 3: Hamburger button — সঠিকভাবে toggle */}
               <button
                 className="lg:hidden p-2 bg-base-200 rounded-lg"
                 onClick={() => setIsOpen((prev) => !prev)}
-                aria-label="Toggle menu"
               >
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -152,10 +169,9 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Spacer */}
+      {/* Spacer remains same... */}
       <div className={`${isScrolled ? "h-[60px] sm:h-[68px]" : "h-[65px] sm:h-[81px]"} transition-all duration-500`} />
 
-      {/* ✅ FIX 4: Mobile Drawer — সম্পূর্ণ নতুন, আগে ছিলই না */}
       {/* Backdrop */}
       {isOpen && (
         <div
@@ -176,10 +192,7 @@ const Navbar = () => {
           <span className="text-lg font-black tracking-tighter uppercase italic">
             TRENDly<span className="text-primary text-2xl">.</span>
           </span>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 rounded-xl bg-base-200"
-          >
+          <button onClick={() => setIsOpen(false)} className="p-2 rounded-xl bg-base-200">
             <X size={20} />
           </button>
         </div>
@@ -191,22 +204,31 @@ const Navbar = () => {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all ${
                 pathname === link.href
                   ? "bg-primary/10 text-primary"
                   : "text-neutral/70 hover:bg-base-200"
               }`}
             >
-              {link.icon}
-              {link.name}
+              <div className="flex items-center gap-3">
+                {link.icon}
+                {link.name}
+              </div>
+              
+              {/* ✅ Mobile Drawer Badge */}
+              {link.name === "Cart" && cartCount > 0 && (
+                <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                  {cartCount}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
 
-        {/* Drawer footer — user / auth + theme toggle */}
+        {/* Footer info remains same... */}
         <div className="px-4 py-5 border-t border-base-200 space-y-3">
-          {/* Theme toggle */}
-          <button
+           {/* ... your existing footer code */}
+           <button
             onClick={toggleTheme}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-base-200 font-bold text-sm"
           >

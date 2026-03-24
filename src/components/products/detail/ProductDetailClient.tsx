@@ -16,6 +16,7 @@ import { TProduct } from "@/types/product";
 import { StarRating } from "./StarRating";
 import { TrustBadges } from "./TrustBadges";
 import { ProductBreadcrumb } from "./ProductBreadcrumb";
+import { useCart } from "@/context/CartContext"; // ✅ Context import kora holo
 
 export default function ProductDetailClient({
   product,
@@ -29,13 +30,19 @@ export default function ProductDetailClient({
   const [addedToCart, setAddedToCart] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const { addToCart } = useCart(); // ✅ addToCart function-ti niye asa holo
+
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 50);
     return () => clearTimeout(t);
   }, []);
 
+  // ✅ Cart handle korar logic update kora holo
   const handleAddToCart = () => {
+    addToCart(product, qty); // Context call kore qty soho add kora
     setAddedToCart(true);
+    
+    // 2 second por "Added!" state reset hobe
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
@@ -161,7 +168,7 @@ export default function ProductDetailClient({
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   disabled={qty === 1}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-base-300 transition-colors disabled:opacity-30"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-base-200 transition-colors disabled:opacity-30"
                 >
                   <Minus size={16} />
                 </button>
@@ -170,7 +177,7 @@ export default function ProductDetailClient({
                 </span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-base-300 transition-colors"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-base-200 transition-colors"
                 >
                   <Plus size={16} />
                 </button>
@@ -178,7 +185,7 @@ export default function ProductDetailClient({
 
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-black text-sm transition-all duration-300 shadow-lg ${addedToCart ? "bg-success text-white" : "bg-primary text-white hover:opacity-90 shadow-primary/20"}`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-black text-sm transition-all duration-300 shadow-lg ${addedToCart ? "bg-success text-white" : "bg-primary text-white hover:bg-primary/90 shadow-primary/20"}`}
               >
                 {addedToCart ? (
                   <>
