@@ -1,4 +1,5 @@
 "use client";
+import { generateInvoice } from "@/lib/invoice";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -9,12 +10,13 @@ import {
   ExternalLink,
   Loader2,
   ShoppingBag,
+  Download,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-
-import { TOrder } from "@/types/order"; // পাথ চেক করে নিন
 import Image from "next/image";
 import Link from "next/link";
+
+import { TOrder } from "@/types/order";
 import { getUserOrders } from "@/services/order.service";
 
 const MyOrders = () => {
@@ -40,42 +42,38 @@ const MyOrders = () => {
     fetchOrders();
   }, [session?.user?.accessToken]);
 
-  // ২. টোটাল স্পেন্ট ক্যালকুলেট করা (শুধুমাত্র পেইড বা সাকসেসফুল অর্ডার)
   const totalSpent = orders
     .filter((order) => order.paymentStatus === "paid")
     .reduce((sum, order) => sum + order.price * (order.quantity || 1), 0);
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return (
-          <span className="badge badge-warning badge-sm font-bold gap-1 py-3 px-4">
-            <Clock size={14} /> Pending
-          </span>
-        );
-      case "confirmed":
-        return (
-          <span className="badge badge-info badge-sm font-bold gap-1 py-3 px-4 text-white">
-            <CheckCircle2 size={14} /> Confirmed
-          </span>
-        );
-      case "delivered":
-        return (
-          <span className="badge badge-success badge-sm font-bold gap-1 py-3 px-4 text-white">
-            <Truck size={14} /> Delivered
-          </span>
-        );
-      case "cancelled":
-        return (
-          <span className="badge badge-error badge-sm font-bold gap-1 py-3 px-4 text-white">
-            <XCircle size={14} /> Cancelled
-          </span>
-        );
-      default:
-        return (
-          <span className="badge badge-ghost badge-sm uppercase">{status}</span>
-        );
-    }
+    const badgeMap: Record<string, JSX.Element> = {
+      pending: (
+        <span className="badge badge-warning badge-sm font-bold gap-1 py-3 px-4">
+          <Clock size={14} /> Pending
+        </span>
+      ),
+      confirmed: (
+        <span className="badge badge-info badge-sm font-bold gap-1 py-3 px-4 text-white">
+          <CheckCircle2 size={14} /> Confirmed
+        </span>
+      ),
+      delivered: (
+        <span className="badge badge-success badge-sm font-bold gap-1 py-3 px-4 text-white">
+          <Truck size={14} /> Delivered
+        </span>
+      ),
+      cancelled: (
+        <span className="badge badge-error badge-sm font-bold gap-1 py-3 px-4 text-white">
+          <XCircle size={14} /> Cancelled
+        </span>
+      ),
+    };
+    return (
+      badgeMap[status] || (
+        <span className="badge badge-ghost uppercase">{status}</span>
+      )
+    );
   };
 
   if (loading) {
@@ -110,7 +108,7 @@ const MyOrders = () => {
         </div>
       </div>
 
-      {/* Orders Table/List */}
+      {/* Orders Table */}
       <div className="bg-base-100 rounded-[2rem] border border-base-200 overflow-hidden shadow-xl shadow-base-300/20">
         <div className="overflow-x-auto">
           <table className="table table-lg w-full">
@@ -127,7 +125,7 @@ const MyOrders = () => {
             <tbody className="divide-y divide-base-200">
               {orders.length > 0 ? (
                 orders.map((order) => {
-                  const item = order.itemId as any; // TProduct টাইপ অনুযায়ী
+                  const item = order.itemId as any;
                   return (
                     <tr
                       key={order._id}
@@ -140,16 +138,17 @@ const MyOrders = () => {
                               <Image
                                 src={item?.image || "/placeholder.png"}
                                 alt={item?.title || "Product"}
-                                fill
+                                width={100}
+                                height={100}
                                 className="object-cover"
                               />
                             </div>
                           </div>
                           <div>
-                            <div className="font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 max-w-[200px]">
+                            <div className="font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 max-w-[180px]">
                               {item?.title || "Product Removed"}
                             </div>
-                            <div className="text-xs font-bold text-neutral/40 uppercase tracking-tighter">
+                            <div className="text-xs font-bold text-neutral/40 uppercase">
                               Qty: {order.quantity}
                             </div>
                           </div>
@@ -171,40 +170,53 @@ const MyOrders = () => {
                           ${(order.price * order.quantity).toFixed(2)}
                         </div>
                         <div
-                          className={`text-[10px] font-bold uppercase ${order.paymentStatus === "paid" ? "text-success" : "text-error"}`}
+                          className={`text-[10px] font-bold uppercase ${
+                            order.paymentStatus === "paid"
+                              ? "text-success"
+                              : "text-error"
+                          }`}
                         >
                           {order.paymentStatus}
                         </div>
                       </td>
                       <th className="text-right">
-                        <Link
-                          href={`/dashboard/my-orders/${order._id}`}
-                          className="btn btn-ghost btn-circle hover:bg-primary hover:text-white transition-all"
-                        >
-                          <ExternalLink size={18} />
-                        </Link>
+                        <div className="flex justify-end gap-2">
+                          <Link
+                            href={`/dashboard/my-orders/${order._id}`}
+                            className="btn btn-ghost btn-circle btn-sm hover:bg-primary hover:text-white transition-all"
+                            title="View Details"
+                          >
+                            <ExternalLink size={18} />
+                          </Link>
+
+                          <button
+                            onClick={() => generateInvoice(order)}
+                            className="btn btn-ghost btn-circle btn-sm text-success hover:bg-success hover:text-white transition-all"
+                            title="Download Invoice"
+                          >
+                            <Download size={18} />
+                          </button>
+                        </div>
                       </th>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-0">
-                    <div className="p-20 text-center bg-base-100">
-                      <ShoppingBag
-                        size={48}
-                        className="mx-auto text-neutral/20 mb-4"
-                      />
-                      <h3 className="text-xl font-bold text-neutral/40">
-                        No orders found yet.
-                      </h3>
-                      <Link
-                        href="/explore"
-                        className="btn btn-primary mt-4 rounded-xl px-8"
-                      >
-                        Start Shopping
-                      </Link>
-                    </div>
+                  <td colSpan={6} className="p-20 text-center">
+                    <ShoppingBag
+                      size={48}
+                      className="mx-auto text-neutral/20 mb-4"
+                    />
+                    <h3 className="text-xl font-bold text-neutral/40">
+                      No orders found yet.
+                    </h3>
+                    <Link
+                      href="/explore"
+                      className="btn btn-primary mt-4 rounded-xl px-8"
+                    >
+                      Start Shopping
+                    </Link>
                   </td>
                 </tr>
               )}

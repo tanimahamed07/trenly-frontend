@@ -1,4 +1,4 @@
-import { TApiResponse } from "@/services/product.service"; // আপনার আগের ফাইল থেকে টাইপ ইম্পোর্ট
+
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -6,8 +6,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
  * ১. ইউজারের সমস্ত অর্ডার পাওয়ার জন্য (Pagination & Filtering সহ)
  */
 export const getUserOrders = async (
-  token: string, 
-  queryParams: string = ""
+  token: string,
+  queryParams: string = "",
 ): Promise<TApiResponse<any>> => {
   try {
     const res = await fetch(`${BASE_URL}/bookings?${queryParams}`, {
@@ -79,7 +79,11 @@ export const getOrderById = async (token: string, id: string) => {
 /**
  * ৪. অর্ডার ক্যান্সেল বা আপডেট করার জন্য (User/Admin)
  */
-export const updateOrderStatus = async (token: string, id: string, statusData: any) => {
+export const updateOrderStatus = async (
+  token: string,
+  id: string,
+  statusData: any,
+) => {
   try {
     const res = await fetch(`${BASE_URL}/bookings/${id}`, {
       method: "PATCH",

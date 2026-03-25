@@ -2,7 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Star, Trash2, Calendar, ShoppingBag, Loader2, MessageSquareText, AlertCircle } from "lucide-react";
+import {
+  Star,
+  Trash2,
+  Calendar,
+  ShoppingBag,
+  Loader2,
+  MessageSquareText,
+  AlertCircle,
+} from "lucide-react";
 import Image from "next/image";
 import { getMyReviews, deleteReview } from "@/services/review.service";
 import { TReview } from "@/types/review";
@@ -36,7 +44,8 @@ const MyReviews = () => {
   // ডিলিট কনফার্মেশন লজিক
   const confirmDelete = (id: string) => {
     toast("Delete Review?", {
-      description: "Are you sure you want to remove this feedback? This action cannot be undone.",
+      description:
+        "Are you sure you want to remove this feedback? This action cannot be undone.",
       action: {
         label: "Delete",
         onClick: () => executeDelete(id),
@@ -53,7 +62,7 @@ const MyReviews = () => {
     const promise = deleteReview(id, session?.user?.accessToken as string);
 
     toast.promise(promise, {
-      loading: 'Deleting your review...',
+      loading: "Deleting your review...",
       success: (res) => {
         if (res.success) {
           setReviews((prev) => prev.filter((r) => r._id !== id));
@@ -87,7 +96,9 @@ const MyReviews = () => {
           <MessageSquareText size={24} />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-secondary uppercase tracking-tight">My Reviews</h1>
+          <h1 className="text-2xl font-black text-secondary uppercase tracking-tight">
+            My Reviews
+          </h1>
           <p className="text-[10px] font-bold text-neutral/40 uppercase tracking-widest">
             Manage your feedback ({reviews.length})
           </p>
@@ -98,24 +109,42 @@ const MyReviews = () => {
         {reviews.map((review) => (
           <div
             key={review._id}
-            className={`group p-4 bg-base-100 border border-base-300 rounded-2xl flex flex-col md:flex-row gap-5 hover:border-primary/30 transition-all shadow-sm ${deletingId === review._id ? 'opacity-50 grayscale' : ''}`}
+            className={`group p-4 bg-base-100 border border-base-300 rounded-2xl flex flex-col md:flex-row gap-5 hover:border-primary/30 transition-all shadow-sm ${deletingId === review._id ? "opacity-50 grayscale" : ""}`}
           >
             {/* ... (প্রোডাক্ট ইমেজ এবং কন্টেন্ট সেকশন আগের মতোই থাকবে) ... */}
-            
+
             <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-base-200 flex-shrink-0 border border-base-300">
-              <Image src={review.itemId?.image || "/placeholder.png"} alt="Product" fill className="object-cover" />
+              <Image
+                src={review.itemId?.image || "/placeholder.png"}
+                alt="Product"
+                fill
+                sizes="(max-width: 768px) 100vw, 300px"
+                className="object-cover"
+              />
             </div>
 
             <div className="flex-1 space-y-2">
               <div className="flex justify-between items-start">
-                 <h3 className="font-bold text-secondary">{review.itemId?.title}</h3>
-                 <div className="flex gap-0.5">
+                <h3 className="font-bold text-secondary">
+                  {review.itemId?.title}
+                </h3>
+                <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} className={i < review.rating ? "fill-warning text-warning" : "text-base-300"} />
+                    <Star
+                      key={i}
+                      size={14}
+                      className={
+                        i < review.rating
+                          ? "fill-warning text-warning"
+                          : "text-base-300"
+                      }
+                    />
                   ))}
                 </div>
               </div>
-              <p className="text-sm text-neutral/60 italic">"{review.comment}"</p>
+              <p className="text-sm text-neutral/60 italic">
+                "{review.comment}"
+              </p>
             </div>
 
             {/* Action Buttons */}

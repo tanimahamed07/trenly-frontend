@@ -11,7 +11,7 @@ export interface TShippingAddress {
 
 export interface TOrder {
   _id: string;
-  // userId সাধারণত পপুলেট হয়ে আসে (কন্ট্রোলার অনুযায়ী)
+
   userId: {
     _id: string;
     name: string;
@@ -19,7 +19,7 @@ export interface TOrder {
     avatar?: string;
   } | string; 
   
-  // itemId ও পপুলেট হয়ে আসে (টাইটেল এবং ইমেজের জন্য)
+
   itemId: TProduct | string; 
   
   quantity: number;
