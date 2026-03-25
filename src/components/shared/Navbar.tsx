@@ -5,8 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
-  ShoppingBag, Menu, X,
-  Moon, Sun, Home, LayoutGrid, ShoppingCart, Info, Mail
+  ShoppingBag,
+  Menu,
+  X,
+  Moon,
+  Sun,
+  Home,
+  LayoutGrid,
+  ShoppingCart,
+  Info,
+  Mail,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext"; // ✅ Context import kora holo
@@ -21,6 +29,7 @@ const Navbar = () => {
   const { cartCount } = useCart(); // ✅ Cart count niye asha holo
   const { data: session } = useSession();
   const user = session?.user as any;
+  console.log('user', user?.role);
 
   useEffect(() => {
     setMounted(true);
@@ -35,7 +44,9 @@ const Navbar = () => {
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -54,7 +65,11 @@ const Navbar = () => {
     { name: "Shop", href: "/explore", icon: <LayoutGrid size={18} /> },
     { name: "About", href: "/about", icon: <Info size={18} /> },
     { name: "Contract", href: "/contract", icon: <Mail size={18} /> },
-    { name: "Orders", href: "/dashboard/my-orders", icon: <ShoppingBag size={18} /> },
+    {
+      name: "Orders",
+      href: "/dashboard/my-orders",
+      icon: <ShoppingBag size={18} />,
+    },
     { name: "Cart", href: "/cart", icon: <ShoppingCart size={18} /> },
   ];
 
@@ -62,21 +77,23 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${
-        isScrolled
-          ? "bg-base-100/80 backdrop-blur-xl shadow-xl py-2"
-          : "bg-base-100 py-3 sm:py-4 border-b border-base-200"
-      }`}>
+      <nav
+        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${
+          isScrolled
+            ? "bg-base-100/80 backdrop-blur-xl shadow-xl py-2"
+            : "bg-base-100 py-3 sm:py-4 border-b border-base-200"
+        }`}
+      >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
-
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <div className="bg-primary p-2 rounded-xl transition-transform group-hover:rotate-12 shadow-lg shadow-primary/20">
                 <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">
-                TRENDly<span className="text-primary text-3xl sm:text-4xl">.</span>
+                TRENDly
+                <span className="text-primary text-3xl sm:text-4xl">.</span>
               </span>
             </Link>
 
@@ -108,7 +125,10 @@ const Navbar = () => {
             {/* Right side actions */}
             <div className="flex items-center gap-3">
               {/* ✅ Mobile Cart Icon (Always visible on mobile) */}
-              <Link href="/cart" className="lg:hidden relative p-2.5 rounded-xl bg-base-200 border border-base-300">
+              <Link
+                href="/cart"
+                className="lg:hidden relative p-2.5 rounded-xl bg-base-200 border border-base-300"
+              >
                 <ShoppingCart size={20} className="text-secondary" />
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-base-100 shadow-md">
@@ -121,31 +141,49 @@ const Navbar = () => {
                 onClick={toggleTheme}
                 className="hidden sm:flex p-2.5 rounded-xl bg-base-200 border border-base-300"
               >
-                {theme === "dark"
-                  ? <Sun size={18} className="text-yellow-400" />
-                  : <Moon size={18} className="text-primary" />}
+                {theme === "dark" ? (
+                  <Sun size={18} className="text-yellow-400" />
+                ) : (
+                  <Moon size={18} className="text-primary" />
+                )}
               </button>
 
               {/* User Dropdown details... (no changes needed) */}
               {user ? (
                 <div className="hidden lg:block dropdown dropdown-end">
-                   {/* ... your existing dropdown code */}
-                   <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20">
+                  {/* ... your existing dropdown code */}
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20"
+                  >
                     <div className="w-9 sm:w-10 rounded-full">
                       <Image
                         alt="User"
-                        src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
-                        width={40} height={40}
+                        src={
+                          user.image ||
+                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`
+                        }
+                        width={40}
+                        height={40}
                       />
                     </div>
                   </div>
-                  <ul tabIndex={0} className="mt-4 p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-2xl w-56 border border-base-300 z-[110]">
+                  <ul
+                    tabIndex={0}
+                    className="mt-4 p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-2xl w-56 border border-base-300 z-[110]"
+                  >
                     <div className="px-4 py-2 border-b border-base-200 mb-2">
                       <p className="font-black text-sm truncate">{user.name}</p>
                     </div>
-                    <li><Link href="/dashboard">Dashboard</Link></li>
                     <li>
-                      <button onClick={() => signOut()} className="text-error font-bold">
+                      <Link href="/dashboard">Dashboard</Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => signOut()}
+                        className="text-error font-bold"
+                      >
                         Logout
                       </button>
                     </li>
@@ -153,8 +191,18 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="hidden lg:flex items-center gap-2">
-                  <Link href="/login" className="btn btn-ghost btn-sm font-bold">Login</Link>
-                  <Link href="/register" className="btn btn-primary btn-sm rounded-xl text-white px-5">Join</Link>
+                  <Link
+                    href="/login"
+                    className="btn btn-ghost btn-sm font-bold"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="btn btn-primary btn-sm rounded-xl text-white px-5"
+                  >
+                    Join
+                  </Link>
                 </div>
               )}
 
@@ -170,7 +218,9 @@ const Navbar = () => {
       </nav>
 
       {/* Spacer remains same... */}
-      <div className={`${isScrolled ? "h-[60px] sm:h-[68px]" : "h-[65px] sm:h-[81px]"} transition-all duration-500`} />
+      <div
+        className={`${isScrolled ? "h-[60px] sm:h-[68px]" : "h-[65px] sm:h-[81px]"} transition-all duration-500`}
+      />
 
       {/* Backdrop */}
       {isOpen && (
@@ -181,18 +231,23 @@ const Navbar = () => {
       )}
 
       {/* Drawer panel */}
-      <div className={`
+      <div
+        className={`
         fixed top-0 right-0 h-full w-[78vw] max-w-xs z-[120]
         bg-base-100 shadow-2xl flex flex-col
         transition-transform duration-300 ease-in-out lg:hidden
         ${isOpen ? "translate-x-0" : "translate-x-full"}
-      `}>
+      `}
+      >
         {/* Drawer header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-base-200">
           <span className="text-lg font-black tracking-tighter uppercase italic">
             TRENDly<span className="text-primary text-2xl">.</span>
           </span>
-          <button onClick={() => setIsOpen(false)} className="p-2 rounded-xl bg-base-200">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-2 rounded-xl bg-base-200"
+          >
             <X size={20} />
           </button>
         </div>
@@ -214,7 +269,7 @@ const Navbar = () => {
                 {link.icon}
                 {link.name}
               </div>
-              
+
               {/* ✅ Mobile Drawer Badge */}
               {link.name === "Cart" && cartCount > 0 && (
                 <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-black">
@@ -227,14 +282,16 @@ const Navbar = () => {
 
         {/* Footer info remains same... */}
         <div className="px-4 py-5 border-t border-base-200 space-y-3">
-           {/* ... your existing footer code */}
-           <button
+          {/* ... your existing footer code */}
+          <button
             onClick={toggleTheme}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-base-200 font-bold text-sm"
           >
-            {theme === "dark"
-              ? <Sun size={18} className="text-yellow-400" />
-              : <Moon size={18} className="text-primary" />}
+            {theme === "dark" ? (
+              <Sun size={18} className="text-yellow-400" />
+            ) : (
+              <Moon size={18} className="text-primary" />
+            )}
             {theme === "dark" ? "Light Mode" : "Dark Mode"}
           </button>
 
@@ -243,11 +300,17 @@ const Navbar = () => {
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-base-200">
                 <Image
                   alt="User"
-                  src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
-                  width={36} height={36}
+                  src={
+                    user.image ||
+                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`
+                  }
+                  width={36}
+                  height={36}
                   className="rounded-full"
                 />
-                <p className="font-black text-sm truncate flex-1">{user.name}</p>
+                <p className="font-black text-sm truncate flex-1">
+                  {user.name}
+                </p>
               </div>
               <Link
                 href="/dashboard"
@@ -257,7 +320,10 @@ const Navbar = () => {
                 Dashboard
               </Link>
               <button
-                onClick={() => { signOut(); setIsOpen(false); }}
+                onClick={() => {
+                  signOut();
+                  setIsOpen(false);
+                }}
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-error hover:bg-error/10 font-bold text-sm"
               >
                 Logout
