@@ -8,13 +8,41 @@ export interface TApiResponse<T> {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_FETCH_TIMEOUT_MS = 8000;
+
+const fetchWithTimeout = async (input: RequestInfo, init?: RequestInit) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(input, {
+      ...init,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
+const isBackendUrlConfigured = () => {
+  if (!BASE_URL || BASE_URL.trim().length === 0) {
+    console.warn(
+      "NEXT_PUBLIC_BACKEND_URL is not set. API requests are disabled.",
+    );
+    return false;
+  }
+  return true;
+};
 
 /**
  * ১. সমস্ত প্রোডাক্ট পাওয়ার জন্য (Search/Filter/Pagination)
  */
 export const getAllProducts = async (queryParams: string = "") => {
+  if (!isBackendUrlConfigured()) return { success: false, data: [] };
+
   try {
-    const res = await fetch(`${BASE_URL}/items?${queryParams}`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items?${queryParams}`, {
       cache: "no-store",
     });
 
@@ -28,18 +56,21 @@ export const getAllProducts = async (queryParams: string = "") => {
 /**
  * ২. সিঙ্গেল প্রোডাক্ট ডিটেইলস
  */
-export const getSingleProduct = async (id: string): Promise<TProduct | null> => {
+export const getSingleProduct = async (
+  id: string,
+): Promise<TProduct | null> => {
+  if (!isBackendUrlConfigured()) return null;
+
   try {
-    const res = await fetch(`${BASE_URL}/items/${id}`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items/${id}`, {
       cache: "no-store",
     });
-    
+
     if (!res.ok) return null;
-    
+
     const data: TApiResponse<TProduct> = await res.json();
     return data.success ? data.data : null;
   } catch {
-    // console.error ব্যবহার করতে চাইলে আন্ডারস্কোর (_) দিয়ে রাখুন, নয়তো শুধু catch {} লিখুন
     return null;
   }
 };
@@ -50,24 +81,23 @@ export const getSingleProduct = async (id: string): Promise<TProduct | null> => 
 export const getRelatedProducts = async (
   category: string,
   currentId: string,
-  limit: number = 8
+  limit: number = 8,
 ): Promise<TProduct[]> => {
+  if (!isBackendUrlConfigured()) return [];
+
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `${BASE_URL}/items?category=${category}&limit=${limit}`,
-      { cache: "no-store" }
+      { cache: "no-store" },
     );
-    
+
     if (!res.ok) return [];
-    
+
     const data: TApiResponse<TProduct[]> = await res.json();
 
     if (!data.success) return [];
 
-    // বর্তমান প্রোডাক্টটি বাদ দিয়ে প্রথম ৪টি রিটার্ন করা
-    return data.data
-      .filter((p) => p._id !== currentId)
-      .slice(0, 4);
+    return data.data.filter((p) => p._id !== currentId).slice(0, 4);
   } catch {
     return [];
   }
@@ -77,13 +107,19 @@ export const getRelatedProducts = async (
  * ৪. ট্রেন্ডিং প্রোডাক্টস (isTrending flag অনুযায়ী)
  */
 export const getTrendingProducts = async (): Promise<TProduct[]> => {
+  if (!isBackendUrlConfigured()) return [];
+
   try {
-    const res = await fetch(`${BASE_URL}/items?isTrending=true&limit=8`, {
-      cache: "no-store",
-    });
-    
+    const res = await fetchWithTimeout(
+      `${BASE_URL}/items?isTrending=true&limit=8`,
+      {
+        next: { revalidate: 3600 },
+        cache: "force-cache",
+      },
+    );
+
     if (!res.ok) return [];
-    
+
     const data: TApiResponse<TProduct[]> = await res.json();
     return data.success ? data.data : [];
   } catch {
@@ -95,13 +131,19 @@ export const getTrendingProducts = async (): Promise<TProduct[]> => {
  * ৫. নিউ অ্যারাইভাল (সর্টিং অনুযায়ী)
  */
 export const getNewArrivalProducts = async (): Promise<TProduct[]> => {
+  if (!isBackendUrlConfigured()) return [];
+
   try {
-    const res = await fetch(`${BASE_URL}/items?sort=-createdAt&limit=8`, {
-      next: { revalidate: 3600 },
-    });
-    
+    const res = await fetchWithTimeout(
+      `${BASE_URL}/items?sort=-createdAt&limit=8`,
+      {
+        next: { revalidate: 3600 },
+        cache: "force-cache",
+      },
+    );
+
     if (!res.ok) return [];
-    
+
     const data: TApiResponse<TProduct[]> = await res.json();
     return data.success ? data.data : [];
   } catch {
@@ -113,13 +155,16 @@ export const getNewArrivalProducts = async (): Promise<TProduct[]> => {
  * ৬. টপ রেটেড প্রোডাক্টস (Rating >= 4)
  */
 export const getTopRatedProducts = async (): Promise<TProduct[]> => {
+  if (!isBackendUrlConfigured()) return [];
+
   try {
-    const res = await fetch(`${BASE_URL}/items?rating=4&limit=8`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items?rating=4&limit=8`, {
       next: { revalidate: 3600 },
+      cache: "force-cache",
     });
-    
+
     if (!res.ok) return [];
-    
+
     const data: TApiResponse<TProduct[]> = await res.json();
     return data.success ? data.data : [];
   } catch {
@@ -127,13 +172,15 @@ export const getTopRatedProducts = async (): Promise<TProduct[]> => {
   }
 };
 
-
 /**
  * ৭. নতুন প্রোডাক্ট তৈরি (Admin Only)
  */
 export const createProduct = async (token: string, productData: any) => {
+  if (!isBackendUrlConfigured())
+    return { success: false, message: "Backend URL not configured" };
+
   try {
-    const res = await fetch(`${BASE_URL}/items`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -150,9 +197,16 @@ export const createProduct = async (token: string, productData: any) => {
 /**
  * ৮. প্রোডাক্ট আপডেট (Admin Only)
  */
-export const updateProduct = async (token: string, id: string, updateData: any) => {
+export const updateProduct = async (
+  token: string,
+  id: string,
+  updateData: any,
+) => {
+  if (!isBackendUrlConfigured())
+    return { success: false, message: "Backend URL not configured" };
+
   try {
-    const res = await fetch(`${BASE_URL}/items/${id}`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -170,8 +224,11 @@ export const updateProduct = async (token: string, id: string, updateData: any) 
  * ৯. প্রোডাক্ট ডিলিট (Admin Only)
  */
 export const deleteProduct = async (token: string, id: string) => {
+  if (!isBackendUrlConfigured())
+    return { success: false, message: "Backend URL not configured" };
+
   try {
-    const res = await fetch(`${BASE_URL}/items/${id}`, {
+    const res = await fetchWithTimeout(`${BASE_URL}/items/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

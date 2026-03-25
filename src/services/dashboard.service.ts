@@ -40,9 +40,6 @@ const fetcher = async (url: string, token: string) => {
 };
 
 export const DashboardService = {
-  /**
-   * ১. অ্যাডমিন স্ট্যাটাস (Admin Only)
-   */
   getDashboardStats: async (token: string): Promise<TApiResponse<any>> => {
     return fetcher(`${BASE_URL}/dashboard/stats`, token);
   },
