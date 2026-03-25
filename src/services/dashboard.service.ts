@@ -9,63 +9,63 @@ export type TApiResponse<T> = {
   error?: any;
 };
 
+/**
+ * Common fetcher function to handle repetitive logic
+ */
+const fetcher = async (url: string, token: string) => {
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Something went wrong");
+    }
+
+    return result;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch data",
+      data: null,
+    };
+  }
+};
+
 export const DashboardService = {
   /**
-   * ১. ড্যাশবোর্ড স্ট্যাটিস্টিকস পাওয়ার জন্য (Admin Only)
+   * ১. অ্যাডমিন স্ট্যাটাস (Admin Only)
    */
   getDashboardStats: async (token: string): Promise<TApiResponse<any>> => {
-    try {
-      const res = await fetch(`${BASE_URL}/dashboard/stats`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store", // রিয়েল টাইম ডাটার জন্য
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to fetch stats");
-      }
-
-      return await res.json();
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "Something went wrong",
-        data: null,
-      };
-    }
+    return fetcher(`${BASE_URL}/dashboard/stats`, token);
   },
 
   /**
-   * ২. চার্ট ডাটা পাওয়ার জন্য (Admin Only)
-   * এটি বার চার্ট, লাইন চার্ট এবং পাই চার্ট ডাটা একসাথে রিটার্ন করবে
+   * ২. অ্যাডমিন চার্ট ডাটা (Admin Only)
    */
   getChartData: async (token: string): Promise<TApiResponse<any>> => {
-    try {
-      const res = await fetch(`${BASE_URL}/dashboard/chart-data`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      });
+    return fetcher(`${BASE_URL}/dashboard/chart-data`, token);
+  },
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to fetch chart data");
-      }
+  /**
+   * ৩. ইউজারের ব্যক্তিগত স্ট্যাটাস (User Only)
+   */
+  getUserDashboardStats: async (token: string): Promise<TApiResponse<any>> => {
+    return fetcher(`${BASE_URL}/dashboard/user-stats`, token);
+    // নোট: ব্যাকএন্ড রাউটে যে নাম দিয়েছেন সেটি নিশ্চিত করুন (যেমন: /user-stats)
+  },
 
-      return await res.json();
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "Something went wrong",
-        data: null,
-      };
-    }
+  /**
+   * ৪. ইউজারের ব্যক্তিগত চার্ট ডাটা (User Only)
+   */
+  getUserChartData: async (token: string): Promise<TApiResponse<any>> => {
+    return fetcher(`${BASE_URL}/dashboard/user-chart-data`, token);
   },
 };

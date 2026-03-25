@@ -247,8 +247,8 @@ const LoginPage = () => {
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button
               onClick={() => {
-                setEmail("user@trendly.com");
-                setPassword("123456");
+                setEmail("user@gmail.com");
+                setPassword("111111");
               }}
               className="btn btn-outline border-base-300 rounded-xl hover:bg-base-200 hover:text-primary transition-all h-auto py-3 flex flex-col items-center gap-1 group"
             >
@@ -262,8 +262,8 @@ const LoginPage = () => {
             </button>
             <button
               onClick={() => {
-                setEmail("admin@trendly.com");
-                setPassword("admin123");
+                setEmail("admin@gmail.com");
+                setPassword("111111");
               }}
               className="btn btn-outline border-base-300 rounded-xl hover:bg-base-200 hover:text-primary transition-all h-auto py-3 flex flex-col items-center gap-1 group"
             >

@@ -1,7 +1,235 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import {
+  ShoppingCart,
+  DollarSign,
+  Loader2,
+  RefreshCcw,
+  PackageCheck,
+  Clock,
+  Ban,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
+import { toast, Toaster } from "sonner";
+import { DashboardService } from "@/services/dashboard.service";
 
 const UserOverview = () => {
-  return <div>User Overview page</div>;
+  const { data: session, status } = useSession();
+  const [stats, setStats] = useState<any>(null);
+  const [charts, setCharts] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  console.log(stats, charts)
+
+  const token = (session?.user as any)?.accessToken;
+  console.log('=============>token',token);
+
+  const fetchData = useCallback(async () => {
+    if (!token) return;
+    try {
+      setLoading(true);
+      const [statsRes, chartsRes] = await Promise.all([
+        DashboardService.getUserDashboardStats(token),
+        DashboardService.getUserChartData(token),
+      ]);
+
+      if (statsRes.success) setStats(statsRes.data);
+      if (chartsRes.success) setCharts(chartsRes.data);
+    } catch (err) {
+      toast.error("Failed to load user dashboard");
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    fetchData();
+  }, [status, fetchData]);
+
+  if (loading) {
+    return (
+      <div className="h-96 flex flex-col items-center justify-center gap-3 bg-base-100 rounded-2xl border border-base-300">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-neutral/40">
+          Loading User Data...
+        </p>
+      </div>
+    );
+  }
+
+  const axisStyle = {
+    fontSize: 10,
+    fontWeight: 600,
+    fill: "currentColor",
+    opacity: 0.6,
+  };
+
+  return (
+    <div className="space-y-6 text-neutral">
+      <Toaster position="top-center" richColors closeButton />
+
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-secondary uppercase tracking-tight">
+            My Dashboard
+          </h2>
+          <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">
+            Welcome back, {session?.user?.name || "User"}
+          </p>
+        </div>
+
+        <button
+          onClick={fetchData}
+          className="btn btn-xs rounded-lg font-black uppercase tracking-tight bg-base-200 border-none hover:bg-primary/10 hover:text-primary transition-colors"
+        >
+          <RefreshCcw size={14} /> Refresh
+        </button>
+      </div>
+
+      {/* Stats - ব্যাকএন্ডের কি-নাম অনুযায়ী ফিক্সড */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<ShoppingCart size={18} />}
+          label="Total Orders"
+          value={stats?.totalOrders || 0}
+        />
+        <StatCard
+          icon={<PackageCheck size={18} />}
+          label="Delivered"
+          value={stats?.deliveredOrders || 0}
+        />
+        <StatCard
+          icon={<DollarSign size={18} />}
+          label="Total Spent"
+          value={`$${stats?.totalSpent || 0}`}
+        />
+        <StatCard
+          icon={<Clock size={18} />}
+          label="Pending"
+          value={stats?.pendingOrders || 0}
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        {/* Spending Trend (Line Chart) */}
+        <div className="bg-base-100 border border-base-300 rounded-2xl p-5">
+          <h3 className="text-xs font-black uppercase mb-6 opacity-50">
+            Spending Trend (30 Days)
+          </h3>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={charts?.lineChart?.labels?.map((l: any, i: number) => ({
+                  name: l,
+                  value: charts.lineChart.datasets[0].data[i],
+                }))}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="currentColor"
+                  opacity={0.1}
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={axisStyle}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={axisStyle}
+                  dx={-10}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-base-100)",
+                    borderColor: "var(--color-base-300)",
+                    color: "var(--color-neutral)",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="var(--color-primary)"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Order Status (Bar Chart - যা ব্যাকএন্ডে pieChart নামে আছে) */}
+        <div className="bg-base-100 border border-base-300 rounded-2xl p-5">
+          <h3 className="text-xs font-black uppercase mb-6 opacity-50">
+            Order Distribution
+          </h3>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={charts?.pieChart?.labels?.map((l: any, i: number) => ({
+                  name: l,
+                  value: charts.pieChart.datasets[0].data[i],
+                }))}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="currentColor"
+                  opacity={0.1}
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={axisStyle}
+                />
+                <YAxis axisLine={false} tickLine={false} tick={axisStyle} />
+                <Tooltip cursor={{ fill: "currentColor", opacity: 0.05 }} />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
+                  {charts?.pieChart?.labels?.map((_: any, index: number) => (
+                    <Cell
+                      key={index}
+                      fill="var(--color-primary)"
+                      opacity={0.8}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
+
+const StatCard = ({ icon, label, value }: any) => (
+  <div className="bg-base-100 border border-base-300 rounded-xl p-4 flex items-center gap-3 hover:shadow-lg transition-all duration-300">
+    <div className="p-2.5 rounded-lg bg-primary/10 text-primary">{icon}</div>
+    <div>
+      <p className="text-[10px] font-black uppercase opacity-40">{label}</p>
+      <p className="text-lg font-black text-secondary">{value}</p>
+    </div>
+  </div>
+);
 
 export default UserOverview;

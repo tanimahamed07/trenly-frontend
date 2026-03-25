@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ShoppingCart, Sparkles, ChevronDown } from "lucide-react";
+import Link from "next/link";
 
 const HeroSection = () => {
   const [activeProduct, setActiveProduct] = useState({
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
     title: "Sony WH-1000XM4",
     price: "299.00",
     originalPrice: "350.00",
@@ -16,21 +18,24 @@ const HeroSection = () => {
   const products = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
       title: "Sony WH-1000XM4",
       price: "299.00",
       originalPrice: "350.00",
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
       title: "Nike Red Sneaker",
       price: "95.00",
       originalPrice: "130.00",
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
       title: "Classic Watch",
       price: "120.00",
       originalPrice: "150.00",
@@ -56,20 +61,29 @@ const HeroSection = () => {
 
             <h1 className="text-4xl md:text-6xl font-black text-secondary leading-[1.1] tracking-tighter">
               Upgrade Your <br />
-              <span className="text-primary italic">Lifestyle</span> with TRENDly.
+              <span className="text-primary italic">Lifestyle</span> with
+              TRENDly.
             </h1>
 
             <p className="text-base text-neutral/70 max-w-lg leading-relaxed">
               Discover premium{" "}
               <span className="text-secondary font-bold">Electronics</span> and
-              <span className="text-secondary font-bold"> Fashion</span> footwear.
+              <span className="text-secondary font-bold"> Fashion</span>{" "}
+              footwear.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
-              <button className="btn btn-primary btn-lg rounded-2xl px-10 text-white shadow-lg shadow-primary/20 group hover:scale-105 active:scale-95 transition-all">
+              {/* button-এর বদলে Link ব্যবহার করা হয়েছে */}
+              <Link
+                href="/explore"
+                className="btn btn-primary btn-lg rounded-2xl px-10 text-white shadow-lg shadow-primary/20 group hover:scale-105 active:scale-95 transition-all flex items-center"
+              >
                 Explore Shop
-                <ShoppingCart size={20} className="ml-2 group-hover:rotate-12 transition-transform" />
-              </button>
+                <ShoppingCart
+                  size={20}
+                  className="ml-2 group-hover:rotate-12 transition-transform"
+                />
+              </Link>
             </div>
           </div>
 
@@ -86,7 +100,9 @@ const HeroSection = () => {
               />
               <div className="absolute inset-x-6 bottom-6 bg-base-100/90 dark:bg-base-200/90 backdrop-blur-md p-5 rounded-2xl border border-primary/20 shadow-2xl flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase font-bold opacity-60">Featured Product</p>
+                  <p className="text-xs uppercase font-bold opacity-60">
+                    Featured Product
+                  </p>
                   <h4 className="text-lg font-black text-secondary truncate max-w-[150px]">
                     {activeProduct.title}
                   </h4>
@@ -130,7 +146,9 @@ const HeroSection = () => {
 
       {/* ✅ FIX 4: Scroll indicator — mobile-এ relative, desktop-এ absolute */}
       <div className="hidden lg:flex absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce flex-col items-center gap-2 text-neutral/40">
-        <span className="text-xs font-bold uppercase tracking-widest">Scroll to explore</span>
+        <span className="text-xs font-bold uppercase tracking-widest">
+          Scroll to explore
+        </span>
         <ChevronDown size={20} />
       </div>
     </section>

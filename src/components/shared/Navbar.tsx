@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -15,9 +15,11 @@ import {
   ShoppingCart,
   Info,
   Mail,
+  Users,
+  PackageSearch,
 } from "lucide-react";
 import Image from "next/image";
-import { useCart } from "@/context/CartContext"; // ✅ Context import kora holo
+import { useCart } from "@/context/CartContext";
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -26,10 +28,10 @@ const Navbar = () => {
   const [theme, setTheme] = useState("light");
   const pathname = usePathname();
 
-  const { cartCount } = useCart(); // ✅ Cart count niye asha holo
+  const { cartCount } = useCart();
   const { data: session } = useSession();
   const user = session?.user as any;
-  console.log('user', user?.role);
+  const userRole = user?.role;
 
   useEffect(() => {
     setMounted(true);
@@ -60,18 +62,45 @@ const Navbar = () => {
     localStorage.setItem("theme", nextTheme);
   };
 
-  const navLinks = [
-    { name: "Home", href: "/", icon: <Home size={18} /> },
-    { name: "Shop", href: "/explore", icon: <LayoutGrid size={18} /> },
-    { name: "About", href: "/about", icon: <Info size={18} /> },
-    { name: "Contract", href: "/contract", icon: <Mail size={18} /> },
-    {
-      name: "Orders",
-      href: "/dashboard/my-orders",
-      icon: <ShoppingBag size={18} />,
-    },
-    { name: "Cart", href: "/cart", icon: <ShoppingCart size={18} /> },
-  ];
+  // ✅ ডায়নামিক নেভলিঙ্ক জেনারেশন
+  const navLinks = useMemo(() => {
+    // ১. পাবলিক লিঙ্ক (সবার জন্য)
+    const links = [
+      { name: "Home", href: "/", icon: <Home size={18} /> },
+      { name: "Shop", href: "/explore", icon: <LayoutGrid size={18} /> },
+      { name: "About", href: "/about", icon: <Info size={18} /> },
+      { name: "Contract", href: "/contract", icon: <Mail size={18} /> },
+    ];
+
+    // ২. অ্যাডমিন লিঙ্ক (শুধুমাত্র Admin এর জন্য)
+    if (userRole === "admin") {
+      links.push(
+        {
+          name: "Manage Users",
+          href: "/dashboard/manage-users",
+          icon: <Users size={18} />,
+        },
+        {
+          name: "Manage Products",
+          href: "/dashboard/manage-products",
+          icon: <PackageSearch size={18} />,
+        },
+      );
+    }
+    // ৩. ইউজার লিঙ্ক (শুধুমাত্র সাধারণ User এর জন্য)
+    else if (userRole === "user") {
+      links.push(
+        {
+          name: "My Orders",
+          href: "/dashboard/my-orders",
+          icon: <ShoppingBag size={18} />,
+        },
+        { name: "Cart", href: "/cart", icon: <ShoppingCart size={18} /> },
+      );
+    }
+
+    return links;
+  }, [userRole]);
 
   if (!mounted) return <div className="h-[65px] sm:h-[81px] bg-base-100" />;
 
@@ -112,7 +141,7 @@ const Navbar = () => {
                   {link.icon}
                   {link.name}
 
-                  {/* ✅ Desktop Cart Badge */}
+                  {/* Desktop Cart Badge */}
                   {link.name === "Cart" && cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-lg border-2 border-base-100 animate-in zoom-in duration-300">
                       {cartCount}
@@ -124,18 +153,20 @@ const Navbar = () => {
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
-              {/* ✅ Mobile Cart Icon (Always visible on mobile) */}
-              <Link
-                href="/cart"
-                className="lg:hidden relative p-2.5 rounded-xl bg-base-200 border border-base-300"
-              >
-                <ShoppingCart size={20} className="text-secondary" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-base-100 shadow-md">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
+              {/* Mobile Cart Icon (Show only for users or non-logged users) */}
+              {(!userRole || userRole === "user") && (
+                <Link
+                  href="/cart"
+                  className="lg:hidden relative p-2.5 rounded-xl bg-base-200 border border-base-300"
+                >
+                  <ShoppingCart size={20} className="text-secondary" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-base-100 shadow-md">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               <button
                 onClick={toggleTheme}
@@ -148,10 +179,8 @@ const Navbar = () => {
                 )}
               </button>
 
-              {/* User Dropdown details... (no changes needed) */}
               {user ? (
                 <div className="hidden lg:block dropdown dropdown-end">
-                  {/* ... your existing dropdown code */}
                   <div
                     tabIndex={0}
                     role="button"
@@ -175,6 +204,9 @@ const Navbar = () => {
                   >
                     <div className="px-4 py-2 border-b border-base-200 mb-2">
                       <p className="font-black text-sm truncate">{user.name}</p>
+                      <span className="badge badge-primary badge-xs font-bold uppercase">
+                        {userRole}
+                      </span>
                     </div>
                     <li>
                       <Link href="/dashboard">Dashboard</Link>
@@ -217,29 +249,15 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Spacer remains same... */}
+      {/* Spacer */}
       <div
         className={`${isScrolled ? "h-[60px] sm:h-[68px]" : "h-[65px] sm:h-[81px]"} transition-all duration-500`}
       />
 
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Drawer panel */}
+      {/* Mobile Drawer panel */}
       <div
-        className={`
-        fixed top-0 right-0 h-full w-[78vw] max-w-xs z-[120]
-        bg-base-100 shadow-2xl flex flex-col
-        transition-transform duration-300 ease-in-out lg:hidden
-        ${isOpen ? "translate-x-0" : "translate-x-full"}
-      `}
+        className={`fixed top-0 right-0 h-full w-[78vw] max-w-xs z-[120] bg-base-100 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-        {/* Drawer header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-base-200">
           <span className="text-lg font-black tracking-tighter uppercase italic">
             TRENDly<span className="text-primary text-2xl">.</span>
@@ -252,7 +270,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Nav links */}
         <nav className="flex flex-col gap-1 px-4 py-6 flex-1 overflow-y-auto">
           {navLinks.map((link) => (
             <Link
@@ -269,8 +286,6 @@ const Navbar = () => {
                 {link.icon}
                 {link.name}
               </div>
-
-              {/* ✅ Mobile Drawer Badge */}
               {link.name === "Cart" && cartCount > 0 && (
                 <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-black">
                   {cartCount}
@@ -280,21 +295,8 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Footer info remains same... */}
+        {/* User Status at Bottom of Drawer */}
         <div className="px-4 py-5 border-t border-base-200 space-y-3">
-          {/* ... your existing footer code */}
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-base-200 font-bold text-sm"
-          >
-            {theme === "dark" ? (
-              <Sun size={18} className="text-yellow-400" />
-            ) : (
-              <Moon size={18} className="text-primary" />
-            )}
-            {theme === "dark" ? "Light Mode" : "Dark Mode"}
-          </button>
-
           {user ? (
             <>
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-base-200">
@@ -308,22 +310,15 @@ const Navbar = () => {
                   height={36}
                   className="rounded-full"
                 />
-                <p className="font-black text-sm truncate flex-1">
-                  {user.name}
-                </p>
+                <div className="flex flex-col flex-1 truncate">
+                  <p className="font-black text-sm truncate">{user.name}</p>
+                  <p className="text-[10px] uppercase font-bold opacity-50">
+                    {userRole}
+                  </p>
+                </div>
               </div>
-              <Link
-                href="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-base-200 font-bold text-sm"
-              >
-                Dashboard
-              </Link>
               <button
-                onClick={() => {
-                  signOut();
-                  setIsOpen(false);
-                }}
+                onClick={() => signOut()}
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-error hover:bg-error/10 font-bold text-sm"
               >
                 Logout
