@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-  themes: light --default, dark;
+  themes:
+    light --default,
+    dark;
 }
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -10,45 +12,38 @@
   name: "light";
   default: true;
 
-  /* Brand Colors - Minimal & Trustworthy */
-  --color-primary: oklch(45% 0.16 250);    /* Soft Professional Blue - Main Buttons */
-  --color-secondary: oklch(25% 0.05 250);  /* Slate Black - Premium Branding */
-  --color-accent: oklch(70% 0.12 180);     /* Soft Teal - Minor UI Highlights */
+  --color-primary: oklch(45% 0.16 250);
+  --color-secondary: oklch(25% 0.05 250);
+  --color-accent: oklch(70% 0.12 180);
 
-  /* Base Colors - Clean & Spacious */
-  --color-base-100: oklch(100% 0 0);       /* Pure White Background */
-  --color-base-200: oklch(98% 0.005 250);  /* Subtle Grey for section dividers */
-  --color-base-300: oklch(94% 0.01 250);   /* Very Light Border/Lines */
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0.005 250);
+  --color-base-300: oklch(94% 0.01 250);
 
-  /* Content - High Readability */
-  --color-neutral: oklch(20% 0.02 250);    /* Charcoal Grey for Text */
+  --color-neutral: oklch(20% 0.02 250);
   --color-neutral-content: oklch(98% 0.01 250);
 
-  /* Feedback */
-  --color-success: oklch(75% 0.14 150);    /* Muted Green */
-  --color-error: oklch(65% 0.18 25);       /* Muted Red */
-  --color-warning: oklch(85% 0.12 80);     /* Muted Yellow */
-  --color-info: oklch(80% 0.1 230);        /* Sky Blue */
+  --color-success: oklch(75% 0.14 150);
+  --color-error: oklch(65% 0.18 25);
+  --color-warning: oklch(85% 0.12 80);
+  --color-info: oklch(80% 0.1 230);
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
 
-  /* Brand Colors - High Contrast */
-  --color-primary: oklch(70% 0.12 250);    /* Lighter Blue for visibility */
-  --color-secondary: oklch(90% 0.02 250);  /* Off-white for accents */
+  --color-primary: oklch(70% 0.12 250);
+  --color-secondary: oklch(90% 0.02 250);
   --color-accent: oklch(75% 0.1 180);
 
-  /* Base Colors - Deep & Elegant (Not Pure Black) */
-  --color-base-100: oklch(15% 0.015 250);  /* Deep Slate/Dark Grey */
-  --color-base-200: oklch(12% 0.015 250);  /* Slightly Darker Layers */
-  --color-base-300: oklch(25% 0.02 250);   /* Lighter border for Dark Mode */
+  /* ✅ base-200 একটু lighter করা হয়েছে যাতে input visible হয় */
+  --color-base-100: oklch(15% 0.015 250);
+  --color-base-200: oklch(20% 0.015 250); /* 12% → 20% */
+  --color-base-300: oklch(30% 0.02 250); /* 25% → 30% */
 
-  /* Content */
-  --color-neutral: oklch(95% 0.01 250);    /* White Text */
+  --color-neutral: oklch(95% 0.01 250);
   --color-neutral-content: oklch(15% 0.015 250);
 
-  /* Feedback */
   --color-success: oklch(65% 0.12 150);
   --color-error: oklch(60% 0.15 30);
   --color-warning: oklch(80% 0.1 85);
@@ -58,5 +53,13 @@
 @layer base {
   body {
     @apply antialiased transition-colors duration-300 text-neutral bg-base-100;
+  }
+
+  /* ✅ Input/Textarea dark mode fix — globally */
+  input,
+  textarea,
+  select {
+    color: inherit;
+    background-color: inherit;
   }
 }

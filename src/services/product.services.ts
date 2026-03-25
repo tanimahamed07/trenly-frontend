@@ -126,3 +126,59 @@ export const getTopRatedProducts = async (): Promise<TProduct[]> => {
     return [];
   }
 };
+
+
+/**
+ * ৭. নতুন প্রোডাক্ট তৈরি (Admin Only)
+ */
+export const createProduct = async (token: string, productData: any) => {
+  try {
+    const res = await fetch(`${BASE_URL}/items`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
+    });
+    return await res.json();
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * ৮. প্রোডাক্ট আপডেট (Admin Only)
+ */
+export const updateProduct = async (token: string, id: string, updateData: any) => {
+  try {
+    const res = await fetch(`${BASE_URL}/items/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+    return await res.json();
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * ৯. প্রোডাক্ট ডিলিট (Admin Only)
+ */
+export const deleteProduct = async (token: string, id: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/items/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return await res.json();
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+};
