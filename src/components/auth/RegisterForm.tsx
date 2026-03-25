@@ -21,6 +21,7 @@ import {
 import { registerUser } from "@/services/auth.service";
 import { TRegisterData } from "@/types/user";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -70,6 +71,16 @@ const RegisterPage = () => {
       setLoading(false);
     }
   };
+
+const handleGoogleLogin = async () => {
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Google login failed", error);
+      setError("Google login failed. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200/50 px-4 py-20 relative overflow-hidden transition-colors duration-300">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] -z-10" />
@@ -273,7 +284,7 @@ const RegisterPage = () => {
             Social Integration
           </div>
 
-          <button className="btn btn-outline border-base-300 hover:bg-base-200 w-full h-14 rounded-2xl gap-3 normal-case font-bold text-neutral transition-all">
+          <button onClick={handleGoogleLogin} className="btn btn-outline border-base-300 hover:bg-base-200 w-full h-14 rounded-2xl gap-3 normal-case font-bold text-neutral transition-all">
             <Image
               src="https://www.svgrepo.com/show/475656/google-color.svg"
               width={20}

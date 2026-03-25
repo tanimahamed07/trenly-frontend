@@ -56,13 +56,21 @@ const LoginPage = () => {
         // নির্ধারিত callbackUrl-এ রিডাইরেক্ট করা
         setTimeout(() => {
           router.push(callbackUrl);
-          router.refresh(); 
+          router.refresh();
         }, 1500);
       }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+  const handleGoogleLogin = async () => {
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Google login failed", error);
+      setError("Google login failed. Please try again.");
     }
   };
 
@@ -277,7 +285,10 @@ const LoginPage = () => {
             </button>
           </div>
 
-          <button className="btn btn-outline border-base-300 hover:bg-base-200 w-full h-14 rounded-2xl gap-3 normal-case font-bold text-neutral transition-all">
+          <button
+            onClick={handleGoogleLogin}
+            className="btn btn-outline border-base-300 hover:bg-base-200 w-full h-14 rounded-2xl gap-3 normal-case font-bold text-neutral transition-all"
+          >
             <Image
               src="https://www.svgrepo.com/show/475656/google-color.svg"
               width={20}
