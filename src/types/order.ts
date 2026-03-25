@@ -1,4 +1,5 @@
-import { TProduct } from "./product.interface";
+import { TProduct } from "./product";
+
 
 export type TOrderStatus = "pending" | "confirmed" | "delivered" | "cancelled";
 export type TPaymentStatus = "unpaid" | "paid";
