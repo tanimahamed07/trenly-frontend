@@ -1,18 +1,16 @@
 "use client";
 
 import { generateInvoice } from "@/lib/invoice";
-import React, { useEffect, useState, useCallback, ReactNode } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
-  Clock,
   CheckCircle2,
-  Truck,
-  XCircle,
   ExternalLink,
   Loader2,
   ShoppingBag,
   Download,
   AlertCircle,
-  TrendingUp,
+  Calendar,
+  Hash,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -54,37 +52,19 @@ const MyOrders = () => {
 
   const getStatusBadge = (status: string) => {
     const baseClass =
-      "badge badge-sm font-black uppercase text-[10px] py-3 px-4 rounded-xl border-none";
+      "badge badge-sm font-black uppercase text-[9px] py-3 px-3 rounded-lg border-none";
 
     switch (status) {
       case "pending":
-        return (
-          <span className={`${baseClass} bg-warning/10 text-warning`}>
-            Pending
-          </span>
-        );
+        return <span className={`${baseClass} bg-warning/10 text-warning`}>Pending</span>;
       case "confirmed":
-        return (
-          <span className={`${baseClass} bg-info/10 text-info`}>Confirmed</span>
-        );
+        return <span className={`${baseClass} bg-info/10 text-info`}>Confirmed</span>;
       case "delivered":
-        return (
-          <span className={`${baseClass} bg-success/10 text-success`}>
-            Delivered
-          </span>
-        );
+        return <span className={`${baseClass} bg-success/10 text-success`}>Delivered</span>;
       case "cancelled":
-        return (
-          <span className={`${baseClass} bg-error/10 text-error`}>
-            Cancelled
-          </span>
-        );
+        return <span className={`${baseClass} bg-error/10 text-error`}>Cancelled</span>;
       default:
-        return (
-          <span className={`${baseClass} bg-base-200 text-neutral/40`}>
-            {status}
-          </span>
-        );
+        return <span className={`${baseClass} bg-base-200 text-neutral/40`}>{status}</span>;
     }
   };
 
@@ -100,11 +80,11 @@ const MyOrders = () => {
   }
 
   return (
-    <div className="space-y-6 pb-10 px-4 md:px-0">
+    <div className="max-w-7xl mx-auto space-y-6 pb-20 px-4 md:px-0">
       <Toaster position="top-center" richColors closeButton />
 
-      {/* Header Section - Manage Product এর মত ডিজাইন */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
           <h2 className="text-2xl font-black text-secondary uppercase tracking-tight">
             Purchase History
@@ -114,9 +94,12 @@ const MyOrders = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="bg-base-100 border border-base-300 rounded-2xl px-6 py-2 shadow-sm">
-            <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">
+        <div className="bg-base-100 border border-base-300 rounded-2xl px-6 py-3 shadow-sm flex items-center gap-4 w-full sm:w-auto">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+             <ShoppingBag size={20} />
+          </div>
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-widest text-neutral/40 mb-0.5">
               Total Spent
             </div>
             <div className="text-xl font-black text-secondary leading-tight">
@@ -126,27 +109,77 @@ const MyOrders = () => {
         </div>
       </div>
 
-      {/* Table Section - Manage Product এর টেবিল স্টাইল */}
-      <div className="bg-base-100 border border-base-300 rounded-[2rem] overflow-hidden shadow-sm">
+      {/* Mobile Order Cards (Visible only on small screens) */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {orders.length > 0 ? (
+          orders.map((order) => {
+            const item = order.itemId as any;
+            return (
+              <div key={order._id} className="bg-base-100 border border-base-300 rounded-3xl p-5 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between border-b border-base-200 pb-4">
+                  <div className="flex items-center gap-2">
+                    <Hash size={12} className="text-primary" />
+                    <span className="font-mono text-[11px] font-black text-secondary uppercase">
+                      {order._id.slice(-8)}
+                    </span>
+                  </div>
+                  {getStatusBadge(order.status)}
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-base-200 border border-base-300 shrink-0">
+                    <Image src={item?.image || "/placeholder.png"} alt="Product" fill className="object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <h3 className="font-black text-secondary text-sm truncate uppercase tracking-tight">
+                      {item?.title || "Product Removed"}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Calendar size={12} className="text-neutral/30" />
+                      <span className="text-[10px] font-bold text-neutral/40 uppercase tracking-tighter">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-lg font-black text-primary mt-1">
+                      ${(order.price * order.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase ${order.paymentStatus === "paid" ? "text-success" : "text-error"}`}>
+                    {order.paymentStatus === "paid" ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                    {order.paymentStatus}
+                  </div>
+                  <div className="flex gap-2">
+                    <Link href={`/explore/${item?._id}`} className="btn btn-ghost btn-sm btn-square rounded-xl bg-base-200 hover:bg-info/10">
+                      <ExternalLink size={16} />
+                    </Link>
+                    <button 
+                      onClick={() => toast.promise(generateInvoice(order), { loading: "Preparing invoice...", success: "Invoice downloaded!", error: "Failed to generate invoice" })}
+                      className="btn btn-ghost btn-sm btn-square rounded-xl bg-base-200 hover:bg-success/10"
+                    >
+                      <Download size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : null}
+      </div>
+
+      {/* Desktop Table View (Hidden on mobile) */}
+      <div className="hidden md:block bg-base-100 border border-base-300 rounded-[2rem] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="table table-lg w-full">
             <thead className="bg-base-200/50 border-b border-base-300">
               <tr>
-                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">
-                  Product Details
-                </th>
-                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">
-                  Order ID
-                </th>
-                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">
-                  Status & Payment
-                </th>
-                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">
-                  Amount
-                </th>
-                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50 text-right">
-                  Actions
-                </th>
+                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50 p-6">Product Details</th>
+                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">Order ID</th>
+                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">Status & Payment</th>
+                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50">Amount</th>
+                <th className="text-[10px] font-black uppercase tracking-widest text-neutral/50 text-right p-6">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -154,78 +187,47 @@ const MyOrders = () => {
                 orders.map((order) => {
                   const item = order.itemId as any;
                   return (
-                    <tr
-                      key={order._id}
-                      className="hover:bg-base-200/30 transition-colors border-b border-base-200 last:border-0"
-                    >
-                      <td>
+                    <tr key={order._id} className="hover:bg-base-200/30 transition-colors border-b border-base-200 last:border-0">
+                      <td className="p-6">
                         <div className="flex items-center gap-4">
                           <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-base-200 border border-base-300">
-                            <Image
-                              src={item?.image || "/placeholder.png"}
-                              alt={item?.title || "Product"}
-                              fill
-                              className="object-cover"
-                            />
+                            <Image src={item?.image || "/placeholder.png"} alt={item?.title || "Product"} fill className="object-cover" />
                           </div>
                           <div>
-                            <div className="font-black text-secondary line-clamp-1 max-w-[200px]">
-                              {item?.title || "Product Removed"}
-                            </div>
-                            <div className="text-[10px] font-bold text-neutral/40 uppercase tracking-tighter">
-                              Quantity: {order.quantity}
-                            </div>
+                            <div className="font-black text-secondary line-clamp-1 max-w-[200px] uppercase tracking-tight">{item?.title || "Product Removed"}</div>
+                            <div className="text-[10px] font-bold text-neutral/40 uppercase tracking-tighter">Qty: {order.quantity}</div>
                           </div>
                         </div>
                       </td>
                       <td>
-                        <span className="font-mono text-[10px] font-black bg-base-200 px-3 py-1.5 rounded-xl text-secondary border border-base-300">
-                          #{order._id.slice(-8).toUpperCase()}
+                        <span className="font-mono text-[10px] font-black bg-base-200 px-3 py-1.5 rounded-xl text-secondary border border-base-300 uppercase">
+                          #{order._id.slice(-8)}
                         </span>
-                        <div className="text-[10px] font-bold text-neutral/40 mt-1 uppercase italic">
+                        <div className="text-[10px] font-bold text-neutral/40 mt-2 uppercase italic">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </div>
                       </td>
                       <td>
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           {getStatusBadge(order.status)}
-                          <div
-                            className={`flex items-center gap-1 text-[9px] font-black uppercase pl-1 ${order.paymentStatus === "paid" ? "text-success" : "text-error"}`}
-                          >
-                            {order.paymentStatus === "paid" ? (
-                              <CheckCircle2 size={10} />
-                            ) : (
-                              <AlertCircle size={10} />
-                            )}
+                          <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase pl-1 ${order.paymentStatus === "paid" ? "text-success" : "text-error"}`}>
+                            {order.paymentStatus === "paid" ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
                             {order.paymentStatus}
                           </div>
                         </div>
                       </td>
                       <td>
-                        <div className="text-sm font-black text-primary">
-                          ${(order.price * order.quantity).toFixed(2)}
-                        </div>
-                        <div className="text-[9px] font-bold text-neutral/30 uppercase">
-                          Unit: ${order.price}
-                        </div>
+                        <div className="text-sm font-black text-primary">${(order.price * order.quantity).toFixed(2)}</div>
+                        <div className="text-[9px] font-bold text-neutral/30 uppercase">Unit: ${order.price}</div>
                       </td>
-                      <td className="text-right">
+                      <td className="text-right p-6">
                         <div className="flex justify-end gap-2">
-                          <Link
-                            href={`/explore/${item?._id}`}
-                            className="btn btn-ghost btn-sm btn-square rounded-xl hover:bg-info/10 hover:text-info"
-                          >
+                          <Link href={`/explore/${item?._id}`} className="btn btn-ghost btn-sm btn-square rounded-xl hover:bg-info/10 hover:text-info">
                             <ExternalLink size={18} />
                           </Link>
-                          <button
-                            onClick={() => {
-                              toast.promise(generateInvoice(order), {
-                                loading: "Preparing invoice...",
-                                success: "Invoice downloaded!",
-                                error: "Failed to generate invoice",
-                              });
-                            }}
-                            className="btn btn-ghost btn-sm btn-square rounded-xl hover:bg-success/10 hover:text-success"
+                          <button 
+                             onClick={() => toast.promise(generateInvoice(order), { loading: "Preparing invoice...", success: "Invoice downloaded!", error: "Failed to generate invoice" })}
+                             className="btn btn-ghost btn-sm btn-square rounded-xl hover:bg-success/10 hover:text-success"
                           >
                             <Download size={18} />
                           </button>
@@ -234,29 +236,24 @@ const MyOrders = () => {
                     </tr>
                   );
                 })
-              ) : (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="p-20 text-center flex flex-col items-center"
-                  >
-                    <ShoppingBag size={48} className="text-neutral/20 mb-4" />
-                    <p className="font-black text-neutral/40 uppercase tracking-widest text-xs">
-                      You haven&apos;t ordered anything yet
-                    </p>
-                    <Link
-                      href="/explore"
-                      className="btn btn-primary btn-sm rounded-xl mt-4 font-black uppercase text-[10px]"
-                    >
-                      Start Shopping
-                    </Link>
-                  </td>
-                </tr>
-              )}
+              ) : null}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Empty State */}
+      {orders.length === 0 && (
+        <div className="py-20 text-center bg-base-100 border border-base-300 rounded-[2rem] flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center text-neutral/20 mb-4 border border-base-300">
+            <ShoppingBag size={40} />
+          </div>
+          <p className="font-black text-secondary uppercase tracking-widest text-sm">You haven&apos;t ordered anything yet</p>
+          <Link href="/explore" className="btn btn-primary btn-md rounded-2xl mt-6 font-black uppercase text-xs px-8 shadow-lg shadow-primary/20">
+            Start Shopping
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

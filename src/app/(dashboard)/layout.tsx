@@ -41,13 +41,25 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const adminLinks = [
     { name: "Manage Users", href: "/dashboard/manage-users", icon: Users },
-    { name: "Manage Products", href: "/dashboard/manage-products", icon: PackageSearch },
-    { name: "Manage Orders", href: "/dashboard/manage-orders", icon: ClipboardList },
+    {
+      name: "Manage Products",
+      href: "/dashboard/manage-products",
+      icon: PackageSearch,
+    },
+    {
+      name: "Manage Orders",
+      href: "/dashboard/manage-orders",
+      icon: ClipboardList,
+    },
   ];
 
   const userLinks = [
     { name: "My Orders", href: "/dashboard/my-orders", icon: ShoppingBag },
-    { name: "My Reviews", href: "/dashboard/my-reviews", icon: MessageSquareText },
+    {
+      name: "My Reviews",
+      href: "/dashboard/my-reviews",
+      icon: MessageSquareText,
+    },
   ];
 
   const commonBottomLinks = [
@@ -55,8 +67,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
-  const allLinks = [...commonTopLinks, ...adminLinks, ...userLinks, ...commonBottomLinks];
-  const currentPageName = allLinks.find((item) => item.href === pathname)?.name || "Dashboard";
+  const allLinks = [
+    ...commonTopLinks,
+    ...adminLinks,
+    ...userLinks,
+    ...commonBottomLinks,
+  ];
+  const currentPageName =
+    allLinks.find((item) => item.href === pathname)?.name || "Dashboard";
 
   if (!mounted) return null;
 
@@ -127,9 +145,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Common Bottom Section */}
             <div className="pt-2 border-t border-base-200 mt-4">
-               <p className="px-4 mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-neutral/40">
-                  Account Settings
-                </p>
+              <p className="px-4 mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-neutral/40">
+                Account Settings
+              </p>
               {commonBottomLinks.map((item) => (
                 <NavLink key={item.name} item={item} />
               ))}
@@ -161,15 +179,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className="flex items-center gap-3 md:gap-5">
-            <div className="hidden md:flex items-center bg-base-200 rounded-xl px-4 py-2 border border-base-300">
-              <Search size={18} className="text-neutral/40" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-transparent border-none focus:ring-0 text-sm ml-2 w-40 lg:w-60"
-              />
-            </div>
-
             <button className="relative p-2.5 bg-base-200 rounded-xl border border-base-300">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-base-100"></span>
@@ -184,21 +193,26 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   {isAdmin ? "Administrator" : "Premium Member"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl ring-2 ring-primary/10 overflow-hidden relative border border-base-300 bg-base-300">
+              <Link href={'/dashboard/profile'} className="w-10 h-10 rounded-xl ring-2 ring-primary/10 overflow-hidden relative border border-base-300 bg-base-300">
                 {user?.image ? (
-                  <Image src={user.image} alt="Avatar" fill className="object-cover" />
+                  <Image
+                    src={user.image}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-bold text-secondary text-lg">
                     {user?.name?.charAt(0) || "U"}
                   </div>
                 )}
-              </div>
+              </Link>
             </div>
           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto bg-base-200/30 scroll-smooth">
-          <div className="p-6 md:p-10 min-h-full">{children}</div>
+          <div className="p-2 md:p-10 min-h-full">{children}</div>
         </main>
       </div>
 
