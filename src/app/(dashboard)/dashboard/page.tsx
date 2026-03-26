@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
 import { redirect } from "next/navigation";
-import AdminOverview from "@/components/dashboard/AdminOverview";
-import UserOverview from "@/components/dashboard/UserOverview";
+import AdminOverview from "@/components/dashboard/admin/AdminOverview";
+import UserOverview from "@/components/dashboard/user/UserOverview";
 
 const DashboardPage = async () => {
   const session = await getServerSession(authOptions);
